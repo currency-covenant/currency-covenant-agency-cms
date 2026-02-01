@@ -1,0 +1,9 @@
+build
+dist
+node_modules
+.env
+.env.*
+.next
+.next/*
+package.lock.json
+.netlify
