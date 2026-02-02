@@ -3,6 +3,8 @@ import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import path from "path";
 import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
+import { s3Storage } from "@payloadcms/storage-s3";
+import { Media } from "./collections/Media";
 
 import { Pages } from "./collections/Pages";
 import { Tenants } from "./collections/Tenants";
@@ -21,7 +23,7 @@ export default buildConfig({
   admin: {
     user: "users",
   },
-  collections: [Pages, Users, Tenants],
+  collections: [Pages, Users, Tenants, Media],
   // db: mongooseAdapter({
   //   url: process.env.DATABASE_URL as string,
   // }),
@@ -44,6 +46,20 @@ export default buildConfig({
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },
   plugins: [
+    s3Storage({
+      collections: {
+        media: true,
+      },
+      bucket: process.env.S3_BUCKET!,
+      config: {
+        credentials: {
+          accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
+        },
+        region: process.env.S3_REGION,
+        // ... Other S3 configuration
+      },
+    }),
     multiTenantPlugin<Config>({
       collections: {
         pages: {},
