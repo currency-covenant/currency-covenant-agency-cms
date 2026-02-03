@@ -12,13 +12,13 @@
     "generate:schema": "payload-graphql generate:schema",
     "generate:types": "payload generate:types",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
-    "seed": "pnpm run payload migrate:fresh",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start"
   },
   "dependencies": {
     "@payloadcms/db-mongodb": "3.74.0",
     "@payloadcms/db-postgres": "3.74.0",
     "@payloadcms/next": "3.74.0",
+    "@payloadcms/plugin-form-builder": "^3.74.0",
     "@payloadcms/plugin-multi-tenant": "3.74.0",
     "@payloadcms/richtext-lexical": "3.74.0",
     "@payloadcms/storage-r2": "^3.74.0",

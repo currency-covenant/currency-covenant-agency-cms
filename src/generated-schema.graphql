@@ -17,14 +17,22 @@ type Query {
   allMedia(draft: Boolean, where: Media_where, limit: Int, page: Int, pagination: Boolean, select: Boolean, sort: String, trash: Boolean): allMedia
   countallMedia(draft: Boolean, trash: Boolean, where: Media_where): countallMedia
   docAccessMedia(id: Int!): mediaDocAccess
-  MediaWithPrefix(id: Int!, draft: Boolean, select: Boolean, trash: Boolean): MediaWithPrefix
-  MediaWithPrefixes(draft: Boolean, where: MediaWithPrefix_where, limit: Int, page: Int, pagination: Boolean, select: Boolean, sort: String, trash: Boolean): MediaWithPrefixes
-  countMediaWithPrefixes(draft: Boolean, trash: Boolean, where: MediaWithPrefix_where): countMediaWithPrefixes
-  docAccessMediaWithPrefix(id: Int!): media_with_prefixDocAccess
+  Form(id: Int!, draft: Boolean, select: Boolean, trash: Boolean): Form
+  Forms(draft: Boolean, where: Form_where, limit: Int, page: Int, pagination: Boolean, select: Boolean, sort: String, trash: Boolean): Forms
+  countForms(draft: Boolean, trash: Boolean, where: Form_where): countForms
+  docAccessForm(id: Int!): formsDocAccess
+  FormSubmission(id: Int!, draft: Boolean, select: Boolean, trash: Boolean): FormSubmission
+  FormSubmissions(draft: Boolean, where: FormSubmission_where, limit: Int, page: Int, pagination: Boolean, select: Boolean, sort: String, trash: Boolean): FormSubmissions
+  countFormSubmissions(draft: Boolean, trash: Boolean, where: FormSubmission_where): countFormSubmissions
+  docAccessFormSubmission(id: Int!): form_submissionsDocAccess
   PayloadKv(id: Int!, draft: Boolean, select: Boolean, trash: Boolean): PayloadKv
   PayloadKvs(draft: Boolean, where: PayloadKv_where, limit: Int, page: Int, pagination: Boolean, select: Boolean, sort: String, trash: Boolean): PayloadKvs
   countPayloadKvs(draft: Boolean, trash: Boolean, where: PayloadKv_where): countPayloadKvs
   docAccessPayloadKv(id: Int!): payload_kvDocAccess
+  PayloadFolder(id: Int!, draft: Boolean, select: Boolean, trash: Boolean): PayloadFolder
+  PayloadFolders(draft: Boolean, where: PayloadFolder_where, limit: Int, page: Int, pagination: Boolean, select: Boolean, sort: String, trash: Boolean): PayloadFolders
+  countPayloadFolders(draft: Boolean, trash: Boolean, where: PayloadFolder_where): countPayloadFolders
+  docAccessPayloadFolder(id: Int!): payload_foldersDocAccess
   PayloadLockedDocument(id: Int!, draft: Boolean, select: Boolean, trash: Boolean): PayloadLockedDocument
   PayloadLockedDocuments(draft: Boolean, where: PayloadLockedDocument_where, limit: Int, page: Int, pagination: Boolean, select: Boolean, sort: String, trash: Boolean): PayloadLockedDocuments
   countPayloadLockedDocuments(draft: Boolean, trash: Boolean, where: PayloadLockedDocument_where): countPayloadLockedDocuments
@@ -1245,6 +1253,8 @@ type TenantsDeleteDocAccess {
 type Media {
   id: Int!
   alt: String
+  caption(depth: Int): JSON
+  folder: PayloadFolder
   updatedAt: DateTime
   createdAt: DateTime
   url: String
@@ -1259,9 +1269,43 @@ type Media {
   sizes: Media_Sizes
 }
 
+type PayloadFolder {
+  id: Int!
+  name: String!
+  folder: PayloadFolder
+  documentsAndFolders(count: Boolean, limit: Int, page: Int, sort: String, where: JSON): PayloadFolder_DocumentsAndFolders
+  folderType: [PayloadFolder_folderType!]
+  updatedAt: DateTime
+  createdAt: DateTime
+}
+
+type PayloadFolder_DocumentsAndFolders {
+  docs: JSON!
+  hasNextPage: Boolean!
+  totalDocs: Int
+}
+
+enum PayloadFolder_folderType {
+  media
+}
+
 type Media_Sizes {
+  thumbnail: Media_Sizes_Thumbnail
   square: Media_Sizes_Square
-  sixteenByNineMedium: Media_Sizes_SixteenByNineMedium
+  small: Media_Sizes_Small
+  medium: Media_Sizes_Medium
+  large: Media_Sizes_Large
+  xlarge: Media_Sizes_Xlarge
+  og: Media_Sizes_Og
+}
+
+type Media_Sizes_Thumbnail {
+  url: String
+  width: Float
+  height: Float
+  mimeType: String
+  filesize: Float
+  filename: String
 }
 
 type Media_Sizes_Square {
@@ -1273,7 +1317,43 @@ type Media_Sizes_Square {
   filename: String
 }
 
-type Media_Sizes_SixteenByNineMedium {
+type Media_Sizes_Small {
+  url: String
+  width: Float
+  height: Float
+  mimeType: String
+  filesize: Float
+  filename: String
+}
+
+type Media_Sizes_Medium {
+  url: String
+  width: Float
+  height: Float
+  mimeType: String
+  filesize: Float
+  filename: String
+}
+
+type Media_Sizes_Large {
+  url: String
+  width: Float
+  height: Float
+  mimeType: String
+  filesize: Float
+  filename: String
+}
+
+type Media_Sizes_Xlarge {
+  url: String
+  width: Float
+  height: Float
+  mimeType: String
+  filesize: Float
+  filename: String
+}
+
+type Media_Sizes_Og {
   url: String
   width: Float
   height: Float
@@ -1298,6 +1378,8 @@ type allMedia {
 
 input Media_where {
   alt: Media_alt_operator
+  caption: Media_caption_operator
+  folder: Media_folder_operator
   updatedAt: Media_updatedAt_operator
   createdAt: Media_createdAt_operator
   url: Media_url_operator
@@ -1309,18 +1391,48 @@ input Media_where {
   height: Media_height_operator
   focalX: Media_focalX_operator
   focalY: Media_focalY_operator
+  sizes__thumbnail__url: Media_sizes__thumbnail__url_operator
+  sizes__thumbnail__width: Media_sizes__thumbnail__width_operator
+  sizes__thumbnail__height: Media_sizes__thumbnail__height_operator
+  sizes__thumbnail__mimeType: Media_sizes__thumbnail__mimeType_operator
+  sizes__thumbnail__filesize: Media_sizes__thumbnail__filesize_operator
+  sizes__thumbnail__filename: Media_sizes__thumbnail__filename_operator
   sizes__square__url: Media_sizes__square__url_operator
   sizes__square__width: Media_sizes__square__width_operator
   sizes__square__height: Media_sizes__square__height_operator
   sizes__square__mimeType: Media_sizes__square__mimeType_operator
   sizes__square__filesize: Media_sizes__square__filesize_operator
   sizes__square__filename: Media_sizes__square__filename_operator
-  sizes__sixteenByNineMedium__url: Media_sizes__sixteenByNineMedium__url_operator
-  sizes__sixteenByNineMedium__width: Media_sizes__sixteenByNineMedium__width_operator
-  sizes__sixteenByNineMedium__height: Media_sizes__sixteenByNineMedium__height_operator
-  sizes__sixteenByNineMedium__mimeType: Media_sizes__sixteenByNineMedium__mimeType_operator
-  sizes__sixteenByNineMedium__filesize: Media_sizes__sixteenByNineMedium__filesize_operator
-  sizes__sixteenByNineMedium__filename: Media_sizes__sixteenByNineMedium__filename_operator
+  sizes__small__url: Media_sizes__small__url_operator
+  sizes__small__width: Media_sizes__small__width_operator
+  sizes__small__height: Media_sizes__small__height_operator
+  sizes__small__mimeType: Media_sizes__small__mimeType_operator
+  sizes__small__filesize: Media_sizes__small__filesize_operator
+  sizes__small__filename: Media_sizes__small__filename_operator
+  sizes__medium__url: Media_sizes__medium__url_operator
+  sizes__medium__width: Media_sizes__medium__width_operator
+  sizes__medium__height: Media_sizes__medium__height_operator
+  sizes__medium__mimeType: Media_sizes__medium__mimeType_operator
+  sizes__medium__filesize: Media_sizes__medium__filesize_operator
+  sizes__medium__filename: Media_sizes__medium__filename_operator
+  sizes__large__url: Media_sizes__large__url_operator
+  sizes__large__width: Media_sizes__large__width_operator
+  sizes__large__height: Media_sizes__large__height_operator
+  sizes__large__mimeType: Media_sizes__large__mimeType_operator
+  sizes__large__filesize: Media_sizes__large__filesize_operator
+  sizes__large__filename: Media_sizes__large__filename_operator
+  sizes__xlarge__url: Media_sizes__xlarge__url_operator
+  sizes__xlarge__width: Media_sizes__xlarge__width_operator
+  sizes__xlarge__height: Media_sizes__xlarge__height_operator
+  sizes__xlarge__mimeType: Media_sizes__xlarge__mimeType_operator
+  sizes__xlarge__filesize: Media_sizes__xlarge__filesize_operator
+  sizes__xlarge__filename: Media_sizes__xlarge__filename_operator
+  sizes__og__url: Media_sizes__og__url_operator
+  sizes__og__width: Media_sizes__og__width_operator
+  sizes__og__height: Media_sizes__og__height_operator
+  sizes__og__mimeType: Media_sizes__og__mimeType_operator
+  sizes__og__filesize: Media_sizes__og__filesize_operator
+  sizes__og__filename: Media_sizes__og__filename_operator
   id: Media_id_operator
   AND: [Media_where_and]
   OR: [Media_where_or]
@@ -1334,6 +1446,23 @@ input Media_alt_operator {
   in: [String]
   not_in: [String]
   all: [String]
+  exists: Boolean
+}
+
+input Media_caption_operator {
+  equals: JSON
+  not_equals: JSON
+  like: JSON
+  contains: JSON
+  exists: Boolean
+}
+
+input Media_folder_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
   exists: Boolean
 }
 
@@ -1453,6 +1582,69 @@ input Media_focalY_operator {
   exists: Boolean
 }
 
+input Media_sizes__thumbnail__url_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Media_sizes__thumbnail__width_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input Media_sizes__thumbnail__height_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input Media_sizes__thumbnail__mimeType_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Media_sizes__thumbnail__filesize_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input Media_sizes__thumbnail__filename_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
 input Media_sizes__square__url_operator {
   equals: String
   not_equals: String
@@ -1516,7 +1708,7 @@ input Media_sizes__square__filename_operator {
   exists: Boolean
 }
 
-input Media_sizes__sixteenByNineMedium__url_operator {
+input Media_sizes__small__url_operator {
   equals: String
   not_equals: String
   like: String
@@ -1527,7 +1719,7 @@ input Media_sizes__sixteenByNineMedium__url_operator {
   exists: Boolean
 }
 
-input Media_sizes__sixteenByNineMedium__width_operator {
+input Media_sizes__small__width_operator {
   equals: Float
   not_equals: Float
   greater_than_equal: Float
@@ -1537,7 +1729,7 @@ input Media_sizes__sixteenByNineMedium__width_operator {
   exists: Boolean
 }
 
-input Media_sizes__sixteenByNineMedium__height_operator {
+input Media_sizes__small__height_operator {
   equals: Float
   not_equals: Float
   greater_than_equal: Float
@@ -1547,7 +1739,7 @@ input Media_sizes__sixteenByNineMedium__height_operator {
   exists: Boolean
 }
 
-input Media_sizes__sixteenByNineMedium__mimeType_operator {
+input Media_sizes__small__mimeType_operator {
   equals: String
   not_equals: String
   like: String
@@ -1558,7 +1750,7 @@ input Media_sizes__sixteenByNineMedium__mimeType_operator {
   exists: Boolean
 }
 
-input Media_sizes__sixteenByNineMedium__filesize_operator {
+input Media_sizes__small__filesize_operator {
   equals: Float
   not_equals: Float
   greater_than_equal: Float
@@ -1568,7 +1760,259 @@ input Media_sizes__sixteenByNineMedium__filesize_operator {
   exists: Boolean
 }
 
-input Media_sizes__sixteenByNineMedium__filename_operator {
+input Media_sizes__small__filename_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Media_sizes__medium__url_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Media_sizes__medium__width_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input Media_sizes__medium__height_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input Media_sizes__medium__mimeType_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Media_sizes__medium__filesize_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input Media_sizes__medium__filename_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Media_sizes__large__url_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Media_sizes__large__width_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input Media_sizes__large__height_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input Media_sizes__large__mimeType_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Media_sizes__large__filesize_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input Media_sizes__large__filename_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Media_sizes__xlarge__url_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Media_sizes__xlarge__width_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input Media_sizes__xlarge__height_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input Media_sizes__xlarge__mimeType_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Media_sizes__xlarge__filesize_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input Media_sizes__xlarge__filename_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Media_sizes__og__url_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Media_sizes__og__width_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input Media_sizes__og__height_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input Media_sizes__og__mimeType_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Media_sizes__og__filesize_operator {
+  equals: Float
+  not_equals: Float
+  greater_than_equal: Float
+  greater_than: Float
+  less_than_equal: Float
+  less_than: Float
+  exists: Boolean
+}
+
+input Media_sizes__og__filename_operator {
   equals: String
   not_equals: String
   like: String
@@ -1591,6 +2035,8 @@ input Media_id_operator {
 
 input Media_where_and {
   alt: Media_alt_operator
+  caption: Media_caption_operator
+  folder: Media_folder_operator
   updatedAt: Media_updatedAt_operator
   createdAt: Media_createdAt_operator
   url: Media_url_operator
@@ -1602,18 +2048,48 @@ input Media_where_and {
   height: Media_height_operator
   focalX: Media_focalX_operator
   focalY: Media_focalY_operator
+  sizes__thumbnail__url: Media_sizes__thumbnail__url_operator
+  sizes__thumbnail__width: Media_sizes__thumbnail__width_operator
+  sizes__thumbnail__height: Media_sizes__thumbnail__height_operator
+  sizes__thumbnail__mimeType: Media_sizes__thumbnail__mimeType_operator
+  sizes__thumbnail__filesize: Media_sizes__thumbnail__filesize_operator
+  sizes__thumbnail__filename: Media_sizes__thumbnail__filename_operator
   sizes__square__url: Media_sizes__square__url_operator
   sizes__square__width: Media_sizes__square__width_operator
   sizes__square__height: Media_sizes__square__height_operator
   sizes__square__mimeType: Media_sizes__square__mimeType_operator
   sizes__square__filesize: Media_sizes__square__filesize_operator
   sizes__square__filename: Media_sizes__square__filename_operator
-  sizes__sixteenByNineMedium__url: Media_sizes__sixteenByNineMedium__url_operator
-  sizes__sixteenByNineMedium__width: Media_sizes__sixteenByNineMedium__width_operator
-  sizes__sixteenByNineMedium__height: Media_sizes__sixteenByNineMedium__height_operator
-  sizes__sixteenByNineMedium__mimeType: Media_sizes__sixteenByNineMedium__mimeType_operator
-  sizes__sixteenByNineMedium__filesize: Media_sizes__sixteenByNineMedium__filesize_operator
-  sizes__sixteenByNineMedium__filename: Media_sizes__sixteenByNineMedium__filename_operator
+  sizes__small__url: Media_sizes__small__url_operator
+  sizes__small__width: Media_sizes__small__width_operator
+  sizes__small__height: Media_sizes__small__height_operator
+  sizes__small__mimeType: Media_sizes__small__mimeType_operator
+  sizes__small__filesize: Media_sizes__small__filesize_operator
+  sizes__small__filename: Media_sizes__small__filename_operator
+  sizes__medium__url: Media_sizes__medium__url_operator
+  sizes__medium__width: Media_sizes__medium__width_operator
+  sizes__medium__height: Media_sizes__medium__height_operator
+  sizes__medium__mimeType: Media_sizes__medium__mimeType_operator
+  sizes__medium__filesize: Media_sizes__medium__filesize_operator
+  sizes__medium__filename: Media_sizes__medium__filename_operator
+  sizes__large__url: Media_sizes__large__url_operator
+  sizes__large__width: Media_sizes__large__width_operator
+  sizes__large__height: Media_sizes__large__height_operator
+  sizes__large__mimeType: Media_sizes__large__mimeType_operator
+  sizes__large__filesize: Media_sizes__large__filesize_operator
+  sizes__large__filename: Media_sizes__large__filename_operator
+  sizes__xlarge__url: Media_sizes__xlarge__url_operator
+  sizes__xlarge__width: Media_sizes__xlarge__width_operator
+  sizes__xlarge__height: Media_sizes__xlarge__height_operator
+  sizes__xlarge__mimeType: Media_sizes__xlarge__mimeType_operator
+  sizes__xlarge__filesize: Media_sizes__xlarge__filesize_operator
+  sizes__xlarge__filename: Media_sizes__xlarge__filename_operator
+  sizes__og__url: Media_sizes__og__url_operator
+  sizes__og__width: Media_sizes__og__width_operator
+  sizes__og__height: Media_sizes__og__height_operator
+  sizes__og__mimeType: Media_sizes__og__mimeType_operator
+  sizes__og__filesize: Media_sizes__og__filesize_operator
+  sizes__og__filename: Media_sizes__og__filename_operator
   id: Media_id_operator
   AND: [Media_where_and]
   OR: [Media_where_or]
@@ -1621,6 +2097,8 @@ input Media_where_and {
 
 input Media_where_or {
   alt: Media_alt_operator
+  caption: Media_caption_operator
+  folder: Media_folder_operator
   updatedAt: Media_updatedAt_operator
   createdAt: Media_createdAt_operator
   url: Media_url_operator
@@ -1632,18 +2110,48 @@ input Media_where_or {
   height: Media_height_operator
   focalX: Media_focalX_operator
   focalY: Media_focalY_operator
+  sizes__thumbnail__url: Media_sizes__thumbnail__url_operator
+  sizes__thumbnail__width: Media_sizes__thumbnail__width_operator
+  sizes__thumbnail__height: Media_sizes__thumbnail__height_operator
+  sizes__thumbnail__mimeType: Media_sizes__thumbnail__mimeType_operator
+  sizes__thumbnail__filesize: Media_sizes__thumbnail__filesize_operator
+  sizes__thumbnail__filename: Media_sizes__thumbnail__filename_operator
   sizes__square__url: Media_sizes__square__url_operator
   sizes__square__width: Media_sizes__square__width_operator
   sizes__square__height: Media_sizes__square__height_operator
   sizes__square__mimeType: Media_sizes__square__mimeType_operator
   sizes__square__filesize: Media_sizes__square__filesize_operator
   sizes__square__filename: Media_sizes__square__filename_operator
-  sizes__sixteenByNineMedium__url: Media_sizes__sixteenByNineMedium__url_operator
-  sizes__sixteenByNineMedium__width: Media_sizes__sixteenByNineMedium__width_operator
-  sizes__sixteenByNineMedium__height: Media_sizes__sixteenByNineMedium__height_operator
-  sizes__sixteenByNineMedium__mimeType: Media_sizes__sixteenByNineMedium__mimeType_operator
-  sizes__sixteenByNineMedium__filesize: Media_sizes__sixteenByNineMedium__filesize_operator
-  sizes__sixteenByNineMedium__filename: Media_sizes__sixteenByNineMedium__filename_operator
+  sizes__small__url: Media_sizes__small__url_operator
+  sizes__small__width: Media_sizes__small__width_operator
+  sizes__small__height: Media_sizes__small__height_operator
+  sizes__small__mimeType: Media_sizes__small__mimeType_operator
+  sizes__small__filesize: Media_sizes__small__filesize_operator
+  sizes__small__filename: Media_sizes__small__filename_operator
+  sizes__medium__url: Media_sizes__medium__url_operator
+  sizes__medium__width: Media_sizes__medium__width_operator
+  sizes__medium__height: Media_sizes__medium__height_operator
+  sizes__medium__mimeType: Media_sizes__medium__mimeType_operator
+  sizes__medium__filesize: Media_sizes__medium__filesize_operator
+  sizes__medium__filename: Media_sizes__medium__filename_operator
+  sizes__large__url: Media_sizes__large__url_operator
+  sizes__large__width: Media_sizes__large__width_operator
+  sizes__large__height: Media_sizes__large__height_operator
+  sizes__large__mimeType: Media_sizes__large__mimeType_operator
+  sizes__large__filesize: Media_sizes__large__filesize_operator
+  sizes__large__filename: Media_sizes__large__filename_operator
+  sizes__xlarge__url: Media_sizes__xlarge__url_operator
+  sizes__xlarge__width: Media_sizes__xlarge__width_operator
+  sizes__xlarge__height: Media_sizes__xlarge__height_operator
+  sizes__xlarge__mimeType: Media_sizes__xlarge__mimeType_operator
+  sizes__xlarge__filesize: Media_sizes__xlarge__filesize_operator
+  sizes__xlarge__filename: Media_sizes__xlarge__filename_operator
+  sizes__og__url: Media_sizes__og__url_operator
+  sizes__og__width: Media_sizes__og__width_operator
+  sizes__og__height: Media_sizes__og__height_operator
+  sizes__og__mimeType: Media_sizes__og__mimeType_operator
+  sizes__og__filesize: Media_sizes__og__filesize_operator
+  sizes__og__filename: Media_sizes__og__filename_operator
   id: Media_id_operator
   AND: [Media_where_and]
   OR: [Media_where_or]
@@ -1663,6 +2171,8 @@ type mediaDocAccess {
 
 type MediaDocAccessFields {
   alt: MediaDocAccessFields_alt
+  caption: MediaDocAccessFields_caption
+  folder: MediaDocAccessFields_folder
   updatedAt: MediaDocAccessFields_updatedAt
   createdAt: MediaDocAccessFields_createdAt
   url: MediaDocAccessFields_url
@@ -1697,6 +2207,52 @@ type MediaDocAccessFields_alt_Update {
 }
 
 type MediaDocAccessFields_alt_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_caption {
+  create: MediaDocAccessFields_caption_Create
+  read: MediaDocAccessFields_caption_Read
+  update: MediaDocAccessFields_caption_Update
+  delete: MediaDocAccessFields_caption_Delete
+}
+
+type MediaDocAccessFields_caption_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_caption_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_caption_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_caption_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_folder {
+  create: MediaDocAccessFields_folder_Create
+  read: MediaDocAccessFields_folder_Read
+  update: MediaDocAccessFields_folder_Update
+  delete: MediaDocAccessFields_folder_Delete
+}
+
+type MediaDocAccessFields_folder_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_folder_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_folder_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_folder_Delete {
   permission: Boolean!
 }
 
@@ -1978,8 +2534,184 @@ type MediaDocAccessFields_sizes_Delete {
 }
 
 type MediaDocAccessFields_sizes_Fields {
+  thumbnail: MediaDocAccessFields_sizes_thumbnail
   square: MediaDocAccessFields_sizes_square
-  sixteenByNineMedium: MediaDocAccessFields_sizes_sixteenByNineMedium
+  small: MediaDocAccessFields_sizes_small
+  medium: MediaDocAccessFields_sizes_medium
+  large: MediaDocAccessFields_sizes_large
+  xlarge: MediaDocAccessFields_sizes_xlarge
+  og: MediaDocAccessFields_sizes_og
+}
+
+type MediaDocAccessFields_sizes_thumbnail {
+  create: MediaDocAccessFields_sizes_thumbnail_Create
+  read: MediaDocAccessFields_sizes_thumbnail_Read
+  update: MediaDocAccessFields_sizes_thumbnail_Update
+  delete: MediaDocAccessFields_sizes_thumbnail_Delete
+  fields: MediaDocAccessFields_sizes_thumbnail_Fields
+}
+
+type MediaDocAccessFields_sizes_thumbnail_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_Fields {
+  url: MediaDocAccessFields_sizes_thumbnail_url
+  width: MediaDocAccessFields_sizes_thumbnail_width
+  height: MediaDocAccessFields_sizes_thumbnail_height
+  mimeType: MediaDocAccessFields_sizes_thumbnail_mimeType
+  filesize: MediaDocAccessFields_sizes_thumbnail_filesize
+  filename: MediaDocAccessFields_sizes_thumbnail_filename
+}
+
+type MediaDocAccessFields_sizes_thumbnail_url {
+  create: MediaDocAccessFields_sizes_thumbnail_url_Create
+  read: MediaDocAccessFields_sizes_thumbnail_url_Read
+  update: MediaDocAccessFields_sizes_thumbnail_url_Update
+  delete: MediaDocAccessFields_sizes_thumbnail_url_Delete
+}
+
+type MediaDocAccessFields_sizes_thumbnail_url_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_url_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_url_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_url_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_width {
+  create: MediaDocAccessFields_sizes_thumbnail_width_Create
+  read: MediaDocAccessFields_sizes_thumbnail_width_Read
+  update: MediaDocAccessFields_sizes_thumbnail_width_Update
+  delete: MediaDocAccessFields_sizes_thumbnail_width_Delete
+}
+
+type MediaDocAccessFields_sizes_thumbnail_width_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_width_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_width_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_width_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_height {
+  create: MediaDocAccessFields_sizes_thumbnail_height_Create
+  read: MediaDocAccessFields_sizes_thumbnail_height_Read
+  update: MediaDocAccessFields_sizes_thumbnail_height_Update
+  delete: MediaDocAccessFields_sizes_thumbnail_height_Delete
+}
+
+type MediaDocAccessFields_sizes_thumbnail_height_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_height_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_height_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_height_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_mimeType {
+  create: MediaDocAccessFields_sizes_thumbnail_mimeType_Create
+  read: MediaDocAccessFields_sizes_thumbnail_mimeType_Read
+  update: MediaDocAccessFields_sizes_thumbnail_mimeType_Update
+  delete: MediaDocAccessFields_sizes_thumbnail_mimeType_Delete
+}
+
+type MediaDocAccessFields_sizes_thumbnail_mimeType_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_mimeType_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_mimeType_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_mimeType_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_filesize {
+  create: MediaDocAccessFields_sizes_thumbnail_filesize_Create
+  read: MediaDocAccessFields_sizes_thumbnail_filesize_Read
+  update: MediaDocAccessFields_sizes_thumbnail_filesize_Update
+  delete: MediaDocAccessFields_sizes_thumbnail_filesize_Delete
+}
+
+type MediaDocAccessFields_sizes_thumbnail_filesize_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_filesize_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_filesize_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_filesize_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_filename {
+  create: MediaDocAccessFields_sizes_thumbnail_filename_Create
+  read: MediaDocAccessFields_sizes_thumbnail_filename_Read
+  update: MediaDocAccessFields_sizes_thumbnail_filename_Update
+  delete: MediaDocAccessFields_sizes_thumbnail_filename_Delete
+}
+
+type MediaDocAccessFields_sizes_thumbnail_filename_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_filename_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_filename_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_thumbnail_filename_Delete {
+  permission: Boolean!
 }
 
 type MediaDocAccessFields_sizes_square {
@@ -2153,174 +2885,858 @@ type MediaDocAccessFields_sizes_square_filename_Delete {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium {
-  create: MediaDocAccessFields_sizes_sixteenByNineMedium_Create
-  read: MediaDocAccessFields_sizes_sixteenByNineMedium_Read
-  update: MediaDocAccessFields_sizes_sixteenByNineMedium_Update
-  delete: MediaDocAccessFields_sizes_sixteenByNineMedium_Delete
-  fields: MediaDocAccessFields_sizes_sixteenByNineMedium_Fields
+type MediaDocAccessFields_sizes_small {
+  create: MediaDocAccessFields_sizes_small_Create
+  read: MediaDocAccessFields_sizes_small_Read
+  update: MediaDocAccessFields_sizes_small_Update
+  delete: MediaDocAccessFields_sizes_small_Delete
+  fields: MediaDocAccessFields_sizes_small_Fields
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_Create {
+type MediaDocAccessFields_sizes_small_Create {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_Read {
+type MediaDocAccessFields_sizes_small_Read {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_Update {
+type MediaDocAccessFields_sizes_small_Update {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_Delete {
+type MediaDocAccessFields_sizes_small_Delete {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_Fields {
-  url: MediaDocAccessFields_sizes_sixteenByNineMedium_url
-  width: MediaDocAccessFields_sizes_sixteenByNineMedium_width
-  height: MediaDocAccessFields_sizes_sixteenByNineMedium_height
-  mimeType: MediaDocAccessFields_sizes_sixteenByNineMedium_mimeType
-  filesize: MediaDocAccessFields_sizes_sixteenByNineMedium_filesize
-  filename: MediaDocAccessFields_sizes_sixteenByNineMedium_filename
+type MediaDocAccessFields_sizes_small_Fields {
+  url: MediaDocAccessFields_sizes_small_url
+  width: MediaDocAccessFields_sizes_small_width
+  height: MediaDocAccessFields_sizes_small_height
+  mimeType: MediaDocAccessFields_sizes_small_mimeType
+  filesize: MediaDocAccessFields_sizes_small_filesize
+  filename: MediaDocAccessFields_sizes_small_filename
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_url {
-  create: MediaDocAccessFields_sizes_sixteenByNineMedium_url_Create
-  read: MediaDocAccessFields_sizes_sixteenByNineMedium_url_Read
-  update: MediaDocAccessFields_sizes_sixteenByNineMedium_url_Update
-  delete: MediaDocAccessFields_sizes_sixteenByNineMedium_url_Delete
+type MediaDocAccessFields_sizes_small_url {
+  create: MediaDocAccessFields_sizes_small_url_Create
+  read: MediaDocAccessFields_sizes_small_url_Read
+  update: MediaDocAccessFields_sizes_small_url_Update
+  delete: MediaDocAccessFields_sizes_small_url_Delete
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_url_Create {
+type MediaDocAccessFields_sizes_small_url_Create {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_url_Read {
+type MediaDocAccessFields_sizes_small_url_Read {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_url_Update {
+type MediaDocAccessFields_sizes_small_url_Update {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_url_Delete {
+type MediaDocAccessFields_sizes_small_url_Delete {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_width {
-  create: MediaDocAccessFields_sizes_sixteenByNineMedium_width_Create
-  read: MediaDocAccessFields_sizes_sixteenByNineMedium_width_Read
-  update: MediaDocAccessFields_sizes_sixteenByNineMedium_width_Update
-  delete: MediaDocAccessFields_sizes_sixteenByNineMedium_width_Delete
+type MediaDocAccessFields_sizes_small_width {
+  create: MediaDocAccessFields_sizes_small_width_Create
+  read: MediaDocAccessFields_sizes_small_width_Read
+  update: MediaDocAccessFields_sizes_small_width_Update
+  delete: MediaDocAccessFields_sizes_small_width_Delete
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_width_Create {
+type MediaDocAccessFields_sizes_small_width_Create {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_width_Read {
+type MediaDocAccessFields_sizes_small_width_Read {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_width_Update {
+type MediaDocAccessFields_sizes_small_width_Update {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_width_Delete {
+type MediaDocAccessFields_sizes_small_width_Delete {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_height {
-  create: MediaDocAccessFields_sizes_sixteenByNineMedium_height_Create
-  read: MediaDocAccessFields_sizes_sixteenByNineMedium_height_Read
-  update: MediaDocAccessFields_sizes_sixteenByNineMedium_height_Update
-  delete: MediaDocAccessFields_sizes_sixteenByNineMedium_height_Delete
+type MediaDocAccessFields_sizes_small_height {
+  create: MediaDocAccessFields_sizes_small_height_Create
+  read: MediaDocAccessFields_sizes_small_height_Read
+  update: MediaDocAccessFields_sizes_small_height_Update
+  delete: MediaDocAccessFields_sizes_small_height_Delete
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_height_Create {
+type MediaDocAccessFields_sizes_small_height_Create {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_height_Read {
+type MediaDocAccessFields_sizes_small_height_Read {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_height_Update {
+type MediaDocAccessFields_sizes_small_height_Update {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_height_Delete {
+type MediaDocAccessFields_sizes_small_height_Delete {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_mimeType {
-  create: MediaDocAccessFields_sizes_sixteenByNineMedium_mimeType_Create
-  read: MediaDocAccessFields_sizes_sixteenByNineMedium_mimeType_Read
-  update: MediaDocAccessFields_sizes_sixteenByNineMedium_mimeType_Update
-  delete: MediaDocAccessFields_sizes_sixteenByNineMedium_mimeType_Delete
+type MediaDocAccessFields_sizes_small_mimeType {
+  create: MediaDocAccessFields_sizes_small_mimeType_Create
+  read: MediaDocAccessFields_sizes_small_mimeType_Read
+  update: MediaDocAccessFields_sizes_small_mimeType_Update
+  delete: MediaDocAccessFields_sizes_small_mimeType_Delete
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_mimeType_Create {
+type MediaDocAccessFields_sizes_small_mimeType_Create {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_mimeType_Read {
+type MediaDocAccessFields_sizes_small_mimeType_Read {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_mimeType_Update {
+type MediaDocAccessFields_sizes_small_mimeType_Update {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_mimeType_Delete {
+type MediaDocAccessFields_sizes_small_mimeType_Delete {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_filesize {
-  create: MediaDocAccessFields_sizes_sixteenByNineMedium_filesize_Create
-  read: MediaDocAccessFields_sizes_sixteenByNineMedium_filesize_Read
-  update: MediaDocAccessFields_sizes_sixteenByNineMedium_filesize_Update
-  delete: MediaDocAccessFields_sizes_sixteenByNineMedium_filesize_Delete
+type MediaDocAccessFields_sizes_small_filesize {
+  create: MediaDocAccessFields_sizes_small_filesize_Create
+  read: MediaDocAccessFields_sizes_small_filesize_Read
+  update: MediaDocAccessFields_sizes_small_filesize_Update
+  delete: MediaDocAccessFields_sizes_small_filesize_Delete
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_filesize_Create {
+type MediaDocAccessFields_sizes_small_filesize_Create {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_filesize_Read {
+type MediaDocAccessFields_sizes_small_filesize_Read {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_filesize_Update {
+type MediaDocAccessFields_sizes_small_filesize_Update {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_filesize_Delete {
+type MediaDocAccessFields_sizes_small_filesize_Delete {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_filename {
-  create: MediaDocAccessFields_sizes_sixteenByNineMedium_filename_Create
-  read: MediaDocAccessFields_sizes_sixteenByNineMedium_filename_Read
-  update: MediaDocAccessFields_sizes_sixteenByNineMedium_filename_Update
-  delete: MediaDocAccessFields_sizes_sixteenByNineMedium_filename_Delete
+type MediaDocAccessFields_sizes_small_filename {
+  create: MediaDocAccessFields_sizes_small_filename_Create
+  read: MediaDocAccessFields_sizes_small_filename_Read
+  update: MediaDocAccessFields_sizes_small_filename_Update
+  delete: MediaDocAccessFields_sizes_small_filename_Delete
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_filename_Create {
+type MediaDocAccessFields_sizes_small_filename_Create {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_filename_Read {
+type MediaDocAccessFields_sizes_small_filename_Read {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_filename_Update {
+type MediaDocAccessFields_sizes_small_filename_Update {
   permission: Boolean!
 }
 
-type MediaDocAccessFields_sizes_sixteenByNineMedium_filename_Delete {
+type MediaDocAccessFields_sizes_small_filename_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium {
+  create: MediaDocAccessFields_sizes_medium_Create
+  read: MediaDocAccessFields_sizes_medium_Read
+  update: MediaDocAccessFields_sizes_medium_Update
+  delete: MediaDocAccessFields_sizes_medium_Delete
+  fields: MediaDocAccessFields_sizes_medium_Fields
+}
+
+type MediaDocAccessFields_sizes_medium_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_Fields {
+  url: MediaDocAccessFields_sizes_medium_url
+  width: MediaDocAccessFields_sizes_medium_width
+  height: MediaDocAccessFields_sizes_medium_height
+  mimeType: MediaDocAccessFields_sizes_medium_mimeType
+  filesize: MediaDocAccessFields_sizes_medium_filesize
+  filename: MediaDocAccessFields_sizes_medium_filename
+}
+
+type MediaDocAccessFields_sizes_medium_url {
+  create: MediaDocAccessFields_sizes_medium_url_Create
+  read: MediaDocAccessFields_sizes_medium_url_Read
+  update: MediaDocAccessFields_sizes_medium_url_Update
+  delete: MediaDocAccessFields_sizes_medium_url_Delete
+}
+
+type MediaDocAccessFields_sizes_medium_url_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_url_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_url_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_url_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_width {
+  create: MediaDocAccessFields_sizes_medium_width_Create
+  read: MediaDocAccessFields_sizes_medium_width_Read
+  update: MediaDocAccessFields_sizes_medium_width_Update
+  delete: MediaDocAccessFields_sizes_medium_width_Delete
+}
+
+type MediaDocAccessFields_sizes_medium_width_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_width_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_width_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_width_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_height {
+  create: MediaDocAccessFields_sizes_medium_height_Create
+  read: MediaDocAccessFields_sizes_medium_height_Read
+  update: MediaDocAccessFields_sizes_medium_height_Update
+  delete: MediaDocAccessFields_sizes_medium_height_Delete
+}
+
+type MediaDocAccessFields_sizes_medium_height_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_height_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_height_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_height_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_mimeType {
+  create: MediaDocAccessFields_sizes_medium_mimeType_Create
+  read: MediaDocAccessFields_sizes_medium_mimeType_Read
+  update: MediaDocAccessFields_sizes_medium_mimeType_Update
+  delete: MediaDocAccessFields_sizes_medium_mimeType_Delete
+}
+
+type MediaDocAccessFields_sizes_medium_mimeType_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_mimeType_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_mimeType_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_mimeType_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_filesize {
+  create: MediaDocAccessFields_sizes_medium_filesize_Create
+  read: MediaDocAccessFields_sizes_medium_filesize_Read
+  update: MediaDocAccessFields_sizes_medium_filesize_Update
+  delete: MediaDocAccessFields_sizes_medium_filesize_Delete
+}
+
+type MediaDocAccessFields_sizes_medium_filesize_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_filesize_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_filesize_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_filesize_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_filename {
+  create: MediaDocAccessFields_sizes_medium_filename_Create
+  read: MediaDocAccessFields_sizes_medium_filename_Read
+  update: MediaDocAccessFields_sizes_medium_filename_Update
+  delete: MediaDocAccessFields_sizes_medium_filename_Delete
+}
+
+type MediaDocAccessFields_sizes_medium_filename_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_filename_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_filename_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_medium_filename_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large {
+  create: MediaDocAccessFields_sizes_large_Create
+  read: MediaDocAccessFields_sizes_large_Read
+  update: MediaDocAccessFields_sizes_large_Update
+  delete: MediaDocAccessFields_sizes_large_Delete
+  fields: MediaDocAccessFields_sizes_large_Fields
+}
+
+type MediaDocAccessFields_sizes_large_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_Fields {
+  url: MediaDocAccessFields_sizes_large_url
+  width: MediaDocAccessFields_sizes_large_width
+  height: MediaDocAccessFields_sizes_large_height
+  mimeType: MediaDocAccessFields_sizes_large_mimeType
+  filesize: MediaDocAccessFields_sizes_large_filesize
+  filename: MediaDocAccessFields_sizes_large_filename
+}
+
+type MediaDocAccessFields_sizes_large_url {
+  create: MediaDocAccessFields_sizes_large_url_Create
+  read: MediaDocAccessFields_sizes_large_url_Read
+  update: MediaDocAccessFields_sizes_large_url_Update
+  delete: MediaDocAccessFields_sizes_large_url_Delete
+}
+
+type MediaDocAccessFields_sizes_large_url_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_url_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_url_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_url_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_width {
+  create: MediaDocAccessFields_sizes_large_width_Create
+  read: MediaDocAccessFields_sizes_large_width_Read
+  update: MediaDocAccessFields_sizes_large_width_Update
+  delete: MediaDocAccessFields_sizes_large_width_Delete
+}
+
+type MediaDocAccessFields_sizes_large_width_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_width_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_width_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_width_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_height {
+  create: MediaDocAccessFields_sizes_large_height_Create
+  read: MediaDocAccessFields_sizes_large_height_Read
+  update: MediaDocAccessFields_sizes_large_height_Update
+  delete: MediaDocAccessFields_sizes_large_height_Delete
+}
+
+type MediaDocAccessFields_sizes_large_height_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_height_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_height_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_height_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_mimeType {
+  create: MediaDocAccessFields_sizes_large_mimeType_Create
+  read: MediaDocAccessFields_sizes_large_mimeType_Read
+  update: MediaDocAccessFields_sizes_large_mimeType_Update
+  delete: MediaDocAccessFields_sizes_large_mimeType_Delete
+}
+
+type MediaDocAccessFields_sizes_large_mimeType_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_mimeType_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_mimeType_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_mimeType_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_filesize {
+  create: MediaDocAccessFields_sizes_large_filesize_Create
+  read: MediaDocAccessFields_sizes_large_filesize_Read
+  update: MediaDocAccessFields_sizes_large_filesize_Update
+  delete: MediaDocAccessFields_sizes_large_filesize_Delete
+}
+
+type MediaDocAccessFields_sizes_large_filesize_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_filesize_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_filesize_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_filesize_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_filename {
+  create: MediaDocAccessFields_sizes_large_filename_Create
+  read: MediaDocAccessFields_sizes_large_filename_Read
+  update: MediaDocAccessFields_sizes_large_filename_Update
+  delete: MediaDocAccessFields_sizes_large_filename_Delete
+}
+
+type MediaDocAccessFields_sizes_large_filename_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_filename_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_filename_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_large_filename_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge {
+  create: MediaDocAccessFields_sizes_xlarge_Create
+  read: MediaDocAccessFields_sizes_xlarge_Read
+  update: MediaDocAccessFields_sizes_xlarge_Update
+  delete: MediaDocAccessFields_sizes_xlarge_Delete
+  fields: MediaDocAccessFields_sizes_xlarge_Fields
+}
+
+type MediaDocAccessFields_sizes_xlarge_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_Fields {
+  url: MediaDocAccessFields_sizes_xlarge_url
+  width: MediaDocAccessFields_sizes_xlarge_width
+  height: MediaDocAccessFields_sizes_xlarge_height
+  mimeType: MediaDocAccessFields_sizes_xlarge_mimeType
+  filesize: MediaDocAccessFields_sizes_xlarge_filesize
+  filename: MediaDocAccessFields_sizes_xlarge_filename
+}
+
+type MediaDocAccessFields_sizes_xlarge_url {
+  create: MediaDocAccessFields_sizes_xlarge_url_Create
+  read: MediaDocAccessFields_sizes_xlarge_url_Read
+  update: MediaDocAccessFields_sizes_xlarge_url_Update
+  delete: MediaDocAccessFields_sizes_xlarge_url_Delete
+}
+
+type MediaDocAccessFields_sizes_xlarge_url_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_url_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_url_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_url_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_width {
+  create: MediaDocAccessFields_sizes_xlarge_width_Create
+  read: MediaDocAccessFields_sizes_xlarge_width_Read
+  update: MediaDocAccessFields_sizes_xlarge_width_Update
+  delete: MediaDocAccessFields_sizes_xlarge_width_Delete
+}
+
+type MediaDocAccessFields_sizes_xlarge_width_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_width_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_width_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_width_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_height {
+  create: MediaDocAccessFields_sizes_xlarge_height_Create
+  read: MediaDocAccessFields_sizes_xlarge_height_Read
+  update: MediaDocAccessFields_sizes_xlarge_height_Update
+  delete: MediaDocAccessFields_sizes_xlarge_height_Delete
+}
+
+type MediaDocAccessFields_sizes_xlarge_height_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_height_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_height_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_height_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_mimeType {
+  create: MediaDocAccessFields_sizes_xlarge_mimeType_Create
+  read: MediaDocAccessFields_sizes_xlarge_mimeType_Read
+  update: MediaDocAccessFields_sizes_xlarge_mimeType_Update
+  delete: MediaDocAccessFields_sizes_xlarge_mimeType_Delete
+}
+
+type MediaDocAccessFields_sizes_xlarge_mimeType_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_mimeType_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_mimeType_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_mimeType_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_filesize {
+  create: MediaDocAccessFields_sizes_xlarge_filesize_Create
+  read: MediaDocAccessFields_sizes_xlarge_filesize_Read
+  update: MediaDocAccessFields_sizes_xlarge_filesize_Update
+  delete: MediaDocAccessFields_sizes_xlarge_filesize_Delete
+}
+
+type MediaDocAccessFields_sizes_xlarge_filesize_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_filesize_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_filesize_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_filesize_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_filename {
+  create: MediaDocAccessFields_sizes_xlarge_filename_Create
+  read: MediaDocAccessFields_sizes_xlarge_filename_Read
+  update: MediaDocAccessFields_sizes_xlarge_filename_Update
+  delete: MediaDocAccessFields_sizes_xlarge_filename_Delete
+}
+
+type MediaDocAccessFields_sizes_xlarge_filename_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_filename_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_filename_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_xlarge_filename_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og {
+  create: MediaDocAccessFields_sizes_og_Create
+  read: MediaDocAccessFields_sizes_og_Read
+  update: MediaDocAccessFields_sizes_og_Update
+  delete: MediaDocAccessFields_sizes_og_Delete
+  fields: MediaDocAccessFields_sizes_og_Fields
+}
+
+type MediaDocAccessFields_sizes_og_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_Fields {
+  url: MediaDocAccessFields_sizes_og_url
+  width: MediaDocAccessFields_sizes_og_width
+  height: MediaDocAccessFields_sizes_og_height
+  mimeType: MediaDocAccessFields_sizes_og_mimeType
+  filesize: MediaDocAccessFields_sizes_og_filesize
+  filename: MediaDocAccessFields_sizes_og_filename
+}
+
+type MediaDocAccessFields_sizes_og_url {
+  create: MediaDocAccessFields_sizes_og_url_Create
+  read: MediaDocAccessFields_sizes_og_url_Read
+  update: MediaDocAccessFields_sizes_og_url_Update
+  delete: MediaDocAccessFields_sizes_og_url_Delete
+}
+
+type MediaDocAccessFields_sizes_og_url_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_url_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_url_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_url_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_width {
+  create: MediaDocAccessFields_sizes_og_width_Create
+  read: MediaDocAccessFields_sizes_og_width_Read
+  update: MediaDocAccessFields_sizes_og_width_Update
+  delete: MediaDocAccessFields_sizes_og_width_Delete
+}
+
+type MediaDocAccessFields_sizes_og_width_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_width_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_width_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_width_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_height {
+  create: MediaDocAccessFields_sizes_og_height_Create
+  read: MediaDocAccessFields_sizes_og_height_Read
+  update: MediaDocAccessFields_sizes_og_height_Update
+  delete: MediaDocAccessFields_sizes_og_height_Delete
+}
+
+type MediaDocAccessFields_sizes_og_height_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_height_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_height_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_height_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_mimeType {
+  create: MediaDocAccessFields_sizes_og_mimeType_Create
+  read: MediaDocAccessFields_sizes_og_mimeType_Read
+  update: MediaDocAccessFields_sizes_og_mimeType_Update
+  delete: MediaDocAccessFields_sizes_og_mimeType_Delete
+}
+
+type MediaDocAccessFields_sizes_og_mimeType_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_mimeType_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_mimeType_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_mimeType_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_filesize {
+  create: MediaDocAccessFields_sizes_og_filesize_Create
+  read: MediaDocAccessFields_sizes_og_filesize_Read
+  update: MediaDocAccessFields_sizes_og_filesize_Update
+  delete: MediaDocAccessFields_sizes_og_filesize_Delete
+}
+
+type MediaDocAccessFields_sizes_og_filesize_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_filesize_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_filesize_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_filesize_Delete {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_filename {
+  create: MediaDocAccessFields_sizes_og_filename_Create
+  read: MediaDocAccessFields_sizes_og_filename_Read
+  update: MediaDocAccessFields_sizes_og_filename_Update
+  delete: MediaDocAccessFields_sizes_og_filename_Delete
+}
+
+type MediaDocAccessFields_sizes_og_filename_Create {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_filename_Read {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_filename_Update {
+  permission: Boolean!
+}
+
+type MediaDocAccessFields_sizes_og_filename_Delete {
   permission: Boolean!
 }
 
@@ -2344,24 +3760,143 @@ type MediaDeleteDocAccess {
   where: JSONObject
 }
 
-type MediaWithPrefix {
+type Form {
   id: Int!
-  prefix: String
+  title: String!
+  fields: [Form_Fields!]
+  submitButtonLabel: String
+  confirmationType: Form_confirmationType
+  confirmationMessage(depth: Int): JSON
+  redirect: Form_Redirect
+  emails: [Form_Emails!]
   updatedAt: DateTime
   createdAt: DateTime
-  url: String
-  thumbnailURL: String
-  filename: String
-  mimeType: String
-  filesize: Float
-  width: Float
-  height: Float
-  focalX: Float
-  focalY: Float
 }
 
-type MediaWithPrefixes {
-  docs: [MediaWithPrefix!]!
+union Form_Fields = Checkbox | Country | Email | Message | Number | Select | State | Text | Textarea
+
+type Checkbox {
+  name: String!
+  label: String
+  width: Float
+  required: Boolean
+  defaultValue: Boolean
+  id: String
+  blockName: String
+  blockType: String
+}
+
+type Country {
+  name: String!
+  label: String
+  width: Float
+  required: Boolean
+  id: String
+  blockName: String
+  blockType: String
+}
+
+type Email {
+  name: String!
+  label: String
+  width: Float
+  required: Boolean
+  id: String
+  blockName: String
+  blockType: String
+}
+
+type Message {
+  message(depth: Int): JSON
+  id: String
+  blockName: String
+  blockType: String
+}
+
+type Number {
+  name: String!
+  label: String
+  width: Float
+  defaultValue: Float
+  required: Boolean
+  id: String
+  blockName: String
+  blockType: String
+}
+
+type Select {
+  name: String!
+  label: String
+  width: Float
+  defaultValue: String
+  placeholder: String
+  options: [Select_Options!]
+  required: Boolean
+  id: String
+  blockName: String
+  blockType: String
+}
+
+type Select_Options {
+  label: String
+  value: String
+  id: String
+}
+
+type State {
+  name: String!
+  label: String
+  width: Float
+  required: Boolean
+  id: String
+  blockName: String
+  blockType: String
+}
+
+type Text {
+  name: String!
+  label: String
+  width: Float
+  defaultValue: String
+  required: Boolean
+  id: String
+  blockName: String
+  blockType: String
+}
+
+type Textarea {
+  name: String!
+  label: String
+  width: Float
+  defaultValue: String
+  required: Boolean
+  id: String
+  blockName: String
+  blockType: String
+}
+
+enum Form_confirmationType {
+  message
+  redirect
+}
+
+type Form_Redirect {
+  url: String
+}
+
+type Form_Emails {
+  emailTo: String
+  cc: String
+  bcc: String
+  replyTo: String
+  emailFrom: String
+  subject: String
+  message(depth: Int): JSON
+  id: String
+}
+
+type Forms {
+  docs: [Form!]!
   hasNextPage: Boolean!
   hasPrevPage: Boolean!
   limit: Int!
@@ -2374,25 +3909,38 @@ type MediaWithPrefixes {
   totalPages: Int!
 }
 
-input MediaWithPrefix_where {
-  prefix: MediaWithPrefix_prefix_operator
-  updatedAt: MediaWithPrefix_updatedAt_operator
-  createdAt: MediaWithPrefix_createdAt_operator
-  url: MediaWithPrefix_url_operator
-  thumbnailURL: MediaWithPrefix_thumbnailURL_operator
-  filename: MediaWithPrefix_filename_operator
-  mimeType: MediaWithPrefix_mimeType_operator
-  filesize: MediaWithPrefix_filesize_operator
-  width: MediaWithPrefix_width_operator
-  height: MediaWithPrefix_height_operator
-  focalX: MediaWithPrefix_focalX_operator
-  focalY: MediaWithPrefix_focalY_operator
-  id: MediaWithPrefix_id_operator
-  AND: [MediaWithPrefix_where_and]
-  OR: [MediaWithPrefix_where_or]
+input Form_where {
+  title: Form_title_operator
+  submitButtonLabel: Form_submitButtonLabel_operator
+  confirmationType: Form_confirmationType_operator
+  confirmationMessage: Form_confirmationMessage_operator
+  redirect__url: Form_redirect__url_operator
+  emails__emailTo: Form_emails__emailTo_operator
+  emails__cc: Form_emails__cc_operator
+  emails__bcc: Form_emails__bcc_operator
+  emails__replyTo: Form_emails__replyTo_operator
+  emails__emailFrom: Form_emails__emailFrom_operator
+  emails__subject: Form_emails__subject_operator
+  emails__message: Form_emails__message_operator
+  emails__id: Form_emails__id_operator
+  updatedAt: Form_updatedAt_operator
+  createdAt: Form_createdAt_operator
+  id: Form_id_operator
+  AND: [Form_where_and]
+  OR: [Form_where_or]
 }
 
-input MediaWithPrefix_prefix_operator {
+input Form_title_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+}
+
+input Form_submitButtonLabel_operator {
   equals: String
   not_equals: String
   like: String
@@ -2403,7 +3951,121 @@ input MediaWithPrefix_prefix_operator {
   exists: Boolean
 }
 
-input MediaWithPrefix_updatedAt_operator {
+input Form_confirmationType_operator {
+  equals: Form_confirmationType_Input
+  not_equals: Form_confirmationType_Input
+  like: Form_confirmationType_Input
+  contains: Form_confirmationType_Input
+  exists: Boolean
+}
+
+enum Form_confirmationType_Input {
+  message
+  redirect
+}
+
+input Form_confirmationMessage_operator {
+  equals: JSON
+  not_equals: JSON
+  like: JSON
+  contains: JSON
+}
+
+input Form_redirect__url_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+}
+
+input Form_emails__emailTo_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Form_emails__cc_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Form_emails__bcc_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Form_emails__replyTo_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Form_emails__emailFrom_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Form_emails__subject_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+}
+
+input Form_emails__message_operator {
+  equals: JSON
+  not_equals: JSON
+  like: JSON
+  contains: JSON
+  exists: Boolean
+}
+
+input Form_emails__id_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input Form_updatedAt_operator {
   equals: DateTime
   not_equals: DateTime
   greater_than_equal: DateTime
@@ -2414,7 +4076,7 @@ input MediaWithPrefix_updatedAt_operator {
   exists: Boolean
 }
 
-input MediaWithPrefix_createdAt_operator {
+input Form_createdAt_operator {
   equals: DateTime
   not_equals: DateTime
   greater_than_equal: DateTime
@@ -2425,101 +4087,7 @@ input MediaWithPrefix_createdAt_operator {
   exists: Boolean
 }
 
-input MediaWithPrefix_url_operator {
-  equals: String
-  not_equals: String
-  like: String
-  contains: String
-  in: [String]
-  not_in: [String]
-  all: [String]
-  exists: Boolean
-}
-
-input MediaWithPrefix_thumbnailURL_operator {
-  equals: String
-  not_equals: String
-  like: String
-  contains: String
-  in: [String]
-  not_in: [String]
-  all: [String]
-  exists: Boolean
-}
-
-input MediaWithPrefix_filename_operator {
-  equals: String
-  not_equals: String
-  like: String
-  contains: String
-  in: [String]
-  not_in: [String]
-  all: [String]
-  exists: Boolean
-}
-
-input MediaWithPrefix_mimeType_operator {
-  equals: String
-  not_equals: String
-  like: String
-  contains: String
-  in: [String]
-  not_in: [String]
-  all: [String]
-  exists: Boolean
-}
-
-input MediaWithPrefix_filesize_operator {
-  equals: Float
-  not_equals: Float
-  greater_than_equal: Float
-  greater_than: Float
-  less_than_equal: Float
-  less_than: Float
-  exists: Boolean
-}
-
-input MediaWithPrefix_width_operator {
-  equals: Float
-  not_equals: Float
-  greater_than_equal: Float
-  greater_than: Float
-  less_than_equal: Float
-  less_than: Float
-  exists: Boolean
-}
-
-input MediaWithPrefix_height_operator {
-  equals: Float
-  not_equals: Float
-  greater_than_equal: Float
-  greater_than: Float
-  less_than_equal: Float
-  less_than: Float
-  exists: Boolean
-}
-
-input MediaWithPrefix_focalX_operator {
-  equals: Float
-  not_equals: Float
-  greater_than_equal: Float
-  greater_than: Float
-  less_than_equal: Float
-  less_than: Float
-  exists: Boolean
-}
-
-input MediaWithPrefix_focalY_operator {
-  equals: Float
-  not_equals: Float
-  greater_than_equal: Float
-  greater_than: Float
-  less_than_equal: Float
-  less_than: Float
-  exists: Boolean
-}
-
-input MediaWithPrefix_id_operator {
+input Form_id_operator {
   equals: Int
   not_equals: Int
   greater_than_equal: Int
@@ -2529,361 +4097,858 @@ input MediaWithPrefix_id_operator {
   exists: Boolean
 }
 
-input MediaWithPrefix_where_and {
-  prefix: MediaWithPrefix_prefix_operator
-  updatedAt: MediaWithPrefix_updatedAt_operator
-  createdAt: MediaWithPrefix_createdAt_operator
-  url: MediaWithPrefix_url_operator
-  thumbnailURL: MediaWithPrefix_thumbnailURL_operator
-  filename: MediaWithPrefix_filename_operator
-  mimeType: MediaWithPrefix_mimeType_operator
-  filesize: MediaWithPrefix_filesize_operator
-  width: MediaWithPrefix_width_operator
-  height: MediaWithPrefix_height_operator
-  focalX: MediaWithPrefix_focalX_operator
-  focalY: MediaWithPrefix_focalY_operator
-  id: MediaWithPrefix_id_operator
-  AND: [MediaWithPrefix_where_and]
-  OR: [MediaWithPrefix_where_or]
+input Form_where_and {
+  title: Form_title_operator
+  submitButtonLabel: Form_submitButtonLabel_operator
+  confirmationType: Form_confirmationType_operator
+  confirmationMessage: Form_confirmationMessage_operator
+  redirect__url: Form_redirect__url_operator
+  emails__emailTo: Form_emails__emailTo_operator
+  emails__cc: Form_emails__cc_operator
+  emails__bcc: Form_emails__bcc_operator
+  emails__replyTo: Form_emails__replyTo_operator
+  emails__emailFrom: Form_emails__emailFrom_operator
+  emails__subject: Form_emails__subject_operator
+  emails__message: Form_emails__message_operator
+  emails__id: Form_emails__id_operator
+  updatedAt: Form_updatedAt_operator
+  createdAt: Form_createdAt_operator
+  id: Form_id_operator
+  AND: [Form_where_and]
+  OR: [Form_where_or]
 }
 
-input MediaWithPrefix_where_or {
-  prefix: MediaWithPrefix_prefix_operator
-  updatedAt: MediaWithPrefix_updatedAt_operator
-  createdAt: MediaWithPrefix_createdAt_operator
-  url: MediaWithPrefix_url_operator
-  thumbnailURL: MediaWithPrefix_thumbnailURL_operator
-  filename: MediaWithPrefix_filename_operator
-  mimeType: MediaWithPrefix_mimeType_operator
-  filesize: MediaWithPrefix_filesize_operator
-  width: MediaWithPrefix_width_operator
-  height: MediaWithPrefix_height_operator
-  focalX: MediaWithPrefix_focalX_operator
-  focalY: MediaWithPrefix_focalY_operator
-  id: MediaWithPrefix_id_operator
-  AND: [MediaWithPrefix_where_and]
-  OR: [MediaWithPrefix_where_or]
+input Form_where_or {
+  title: Form_title_operator
+  submitButtonLabel: Form_submitButtonLabel_operator
+  confirmationType: Form_confirmationType_operator
+  confirmationMessage: Form_confirmationMessage_operator
+  redirect__url: Form_redirect__url_operator
+  emails__emailTo: Form_emails__emailTo_operator
+  emails__cc: Form_emails__cc_operator
+  emails__bcc: Form_emails__bcc_operator
+  emails__replyTo: Form_emails__replyTo_operator
+  emails__emailFrom: Form_emails__emailFrom_operator
+  emails__subject: Form_emails__subject_operator
+  emails__message: Form_emails__message_operator
+  emails__id: Form_emails__id_operator
+  updatedAt: Form_updatedAt_operator
+  createdAt: Form_createdAt_operator
+  id: Form_id_operator
+  AND: [Form_where_and]
+  OR: [Form_where_or]
 }
 
-type countMediaWithPrefixes {
+type countForms {
   totalDocs: Int
 }
 
-type media_with_prefixDocAccess {
-  fields: MediaWithPrefixDocAccessFields
-  create: MediaWithPrefixCreateDocAccess
-  read: MediaWithPrefixReadDocAccess
-  update: MediaWithPrefixUpdateDocAccess
-  delete: MediaWithPrefixDeleteDocAccess
+type formsDocAccess {
+  fields: FormsDocAccessFields
+  create: FormsCreateDocAccess
+  read: FormsReadDocAccess
+  update: FormsUpdateDocAccess
+  delete: FormsDeleteDocAccess
 }
 
-type MediaWithPrefixDocAccessFields {
-  prefix: MediaWithPrefixDocAccessFields_prefix
-  updatedAt: MediaWithPrefixDocAccessFields_updatedAt
-  createdAt: MediaWithPrefixDocAccessFields_createdAt
-  url: MediaWithPrefixDocAccessFields_url
-  thumbnailURL: MediaWithPrefixDocAccessFields_thumbnailURL
-  filename: MediaWithPrefixDocAccessFields_filename
-  mimeType: MediaWithPrefixDocAccessFields_mimeType
-  filesize: MediaWithPrefixDocAccessFields_filesize
-  width: MediaWithPrefixDocAccessFields_width
-  height: MediaWithPrefixDocAccessFields_height
-  focalX: MediaWithPrefixDocAccessFields_focalX
-  focalY: MediaWithPrefixDocAccessFields_focalY
+type FormsDocAccessFields {
+  title: FormsDocAccessFields_title
+  fields: FormsDocAccessFields_fields
+  submitButtonLabel: FormsDocAccessFields_submitButtonLabel
+  confirmationType: FormsDocAccessFields_confirmationType
+  confirmationMessage: FormsDocAccessFields_confirmationMessage
+  redirect: FormsDocAccessFields_redirect
+  emails: FormsDocAccessFields_emails
+  updatedAt: FormsDocAccessFields_updatedAt
+  createdAt: FormsDocAccessFields_createdAt
 }
 
-type MediaWithPrefixDocAccessFields_prefix {
-  create: MediaWithPrefixDocAccessFields_prefix_Create
-  read: MediaWithPrefixDocAccessFields_prefix_Read
-  update: MediaWithPrefixDocAccessFields_prefix_Update
-  delete: MediaWithPrefixDocAccessFields_prefix_Delete
+type FormsDocAccessFields_title {
+  create: FormsDocAccessFields_title_Create
+  read: FormsDocAccessFields_title_Read
+  update: FormsDocAccessFields_title_Update
+  delete: FormsDocAccessFields_title_Delete
 }
 
-type MediaWithPrefixDocAccessFields_prefix_Create {
+type FormsDocAccessFields_title_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_prefix_Read {
+type FormsDocAccessFields_title_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_prefix_Update {
+type FormsDocAccessFields_title_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_prefix_Delete {
+type FormsDocAccessFields_title_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_updatedAt {
-  create: MediaWithPrefixDocAccessFields_updatedAt_Create
-  read: MediaWithPrefixDocAccessFields_updatedAt_Read
-  update: MediaWithPrefixDocAccessFields_updatedAt_Update
-  delete: MediaWithPrefixDocAccessFields_updatedAt_Delete
+type FormsDocAccessFields_fields {
+  create: FormsDocAccessFields_fields_Create
+  read: FormsDocAccessFields_fields_Read
+  update: FormsDocAccessFields_fields_Update
+  delete: FormsDocAccessFields_fields_Delete
 }
 
-type MediaWithPrefixDocAccessFields_updatedAt_Create {
+type FormsDocAccessFields_fields_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_updatedAt_Read {
+type FormsDocAccessFields_fields_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_updatedAt_Update {
+type FormsDocAccessFields_fields_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_updatedAt_Delete {
+type FormsDocAccessFields_fields_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_createdAt {
-  create: MediaWithPrefixDocAccessFields_createdAt_Create
-  read: MediaWithPrefixDocAccessFields_createdAt_Read
-  update: MediaWithPrefixDocAccessFields_createdAt_Update
-  delete: MediaWithPrefixDocAccessFields_createdAt_Delete
+type FormsDocAccessFields_submitButtonLabel {
+  create: FormsDocAccessFields_submitButtonLabel_Create
+  read: FormsDocAccessFields_submitButtonLabel_Read
+  update: FormsDocAccessFields_submitButtonLabel_Update
+  delete: FormsDocAccessFields_submitButtonLabel_Delete
 }
 
-type MediaWithPrefixDocAccessFields_createdAt_Create {
+type FormsDocAccessFields_submitButtonLabel_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_createdAt_Read {
+type FormsDocAccessFields_submitButtonLabel_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_createdAt_Update {
+type FormsDocAccessFields_submitButtonLabel_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_createdAt_Delete {
+type FormsDocAccessFields_submitButtonLabel_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_url {
-  create: MediaWithPrefixDocAccessFields_url_Create
-  read: MediaWithPrefixDocAccessFields_url_Read
-  update: MediaWithPrefixDocAccessFields_url_Update
-  delete: MediaWithPrefixDocAccessFields_url_Delete
+type FormsDocAccessFields_confirmationType {
+  create: FormsDocAccessFields_confirmationType_Create
+  read: FormsDocAccessFields_confirmationType_Read
+  update: FormsDocAccessFields_confirmationType_Update
+  delete: FormsDocAccessFields_confirmationType_Delete
 }
 
-type MediaWithPrefixDocAccessFields_url_Create {
+type FormsDocAccessFields_confirmationType_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_url_Read {
+type FormsDocAccessFields_confirmationType_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_url_Update {
+type FormsDocAccessFields_confirmationType_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_url_Delete {
+type FormsDocAccessFields_confirmationType_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_thumbnailURL {
-  create: MediaWithPrefixDocAccessFields_thumbnailURL_Create
-  read: MediaWithPrefixDocAccessFields_thumbnailURL_Read
-  update: MediaWithPrefixDocAccessFields_thumbnailURL_Update
-  delete: MediaWithPrefixDocAccessFields_thumbnailURL_Delete
+type FormsDocAccessFields_confirmationMessage {
+  create: FormsDocAccessFields_confirmationMessage_Create
+  read: FormsDocAccessFields_confirmationMessage_Read
+  update: FormsDocAccessFields_confirmationMessage_Update
+  delete: FormsDocAccessFields_confirmationMessage_Delete
 }
 
-type MediaWithPrefixDocAccessFields_thumbnailURL_Create {
+type FormsDocAccessFields_confirmationMessage_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_thumbnailURL_Read {
+type FormsDocAccessFields_confirmationMessage_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_thumbnailURL_Update {
+type FormsDocAccessFields_confirmationMessage_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_thumbnailURL_Delete {
+type FormsDocAccessFields_confirmationMessage_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_filename {
-  create: MediaWithPrefixDocAccessFields_filename_Create
-  read: MediaWithPrefixDocAccessFields_filename_Read
-  update: MediaWithPrefixDocAccessFields_filename_Update
-  delete: MediaWithPrefixDocAccessFields_filename_Delete
+type FormsDocAccessFields_redirect {
+  create: FormsDocAccessFields_redirect_Create
+  read: FormsDocAccessFields_redirect_Read
+  update: FormsDocAccessFields_redirect_Update
+  delete: FormsDocAccessFields_redirect_Delete
+  fields: FormsDocAccessFields_redirect_Fields
 }
 
-type MediaWithPrefixDocAccessFields_filename_Create {
+type FormsDocAccessFields_redirect_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_filename_Read {
+type FormsDocAccessFields_redirect_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_filename_Update {
+type FormsDocAccessFields_redirect_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_filename_Delete {
+type FormsDocAccessFields_redirect_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_mimeType {
-  create: MediaWithPrefixDocAccessFields_mimeType_Create
-  read: MediaWithPrefixDocAccessFields_mimeType_Read
-  update: MediaWithPrefixDocAccessFields_mimeType_Update
-  delete: MediaWithPrefixDocAccessFields_mimeType_Delete
+type FormsDocAccessFields_redirect_Fields {
+  url: FormsDocAccessFields_redirect_url
 }
 
-type MediaWithPrefixDocAccessFields_mimeType_Create {
+type FormsDocAccessFields_redirect_url {
+  create: FormsDocAccessFields_redirect_url_Create
+  read: FormsDocAccessFields_redirect_url_Read
+  update: FormsDocAccessFields_redirect_url_Update
+  delete: FormsDocAccessFields_redirect_url_Delete
+}
+
+type FormsDocAccessFields_redirect_url_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_mimeType_Read {
+type FormsDocAccessFields_redirect_url_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_mimeType_Update {
+type FormsDocAccessFields_redirect_url_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_mimeType_Delete {
+type FormsDocAccessFields_redirect_url_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_filesize {
-  create: MediaWithPrefixDocAccessFields_filesize_Create
-  read: MediaWithPrefixDocAccessFields_filesize_Read
-  update: MediaWithPrefixDocAccessFields_filesize_Update
-  delete: MediaWithPrefixDocAccessFields_filesize_Delete
+type FormsDocAccessFields_emails {
+  create: FormsDocAccessFields_emails_Create
+  read: FormsDocAccessFields_emails_Read
+  update: FormsDocAccessFields_emails_Update
+  delete: FormsDocAccessFields_emails_Delete
+  fields: FormsDocAccessFields_emails_Fields
 }
 
-type MediaWithPrefixDocAccessFields_filesize_Create {
+type FormsDocAccessFields_emails_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_filesize_Read {
+type FormsDocAccessFields_emails_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_filesize_Update {
+type FormsDocAccessFields_emails_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_filesize_Delete {
+type FormsDocAccessFields_emails_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_width {
-  create: MediaWithPrefixDocAccessFields_width_Create
-  read: MediaWithPrefixDocAccessFields_width_Read
-  update: MediaWithPrefixDocAccessFields_width_Update
-  delete: MediaWithPrefixDocAccessFields_width_Delete
+type FormsDocAccessFields_emails_Fields {
+  emailTo: FormsDocAccessFields_emails_emailTo
+  cc: FormsDocAccessFields_emails_cc
+  bcc: FormsDocAccessFields_emails_bcc
+  replyTo: FormsDocAccessFields_emails_replyTo
+  emailFrom: FormsDocAccessFields_emails_emailFrom
+  subject: FormsDocAccessFields_emails_subject
+  message: FormsDocAccessFields_emails_message
+  id: FormsDocAccessFields_emails_id
 }
 
-type MediaWithPrefixDocAccessFields_width_Create {
+type FormsDocAccessFields_emails_emailTo {
+  create: FormsDocAccessFields_emails_emailTo_Create
+  read: FormsDocAccessFields_emails_emailTo_Read
+  update: FormsDocAccessFields_emails_emailTo_Update
+  delete: FormsDocAccessFields_emails_emailTo_Delete
+}
+
+type FormsDocAccessFields_emails_emailTo_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_width_Read {
+type FormsDocAccessFields_emails_emailTo_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_width_Update {
+type FormsDocAccessFields_emails_emailTo_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_width_Delete {
+type FormsDocAccessFields_emails_emailTo_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_height {
-  create: MediaWithPrefixDocAccessFields_height_Create
-  read: MediaWithPrefixDocAccessFields_height_Read
-  update: MediaWithPrefixDocAccessFields_height_Update
-  delete: MediaWithPrefixDocAccessFields_height_Delete
+type FormsDocAccessFields_emails_cc {
+  create: FormsDocAccessFields_emails_cc_Create
+  read: FormsDocAccessFields_emails_cc_Read
+  update: FormsDocAccessFields_emails_cc_Update
+  delete: FormsDocAccessFields_emails_cc_Delete
 }
 
-type MediaWithPrefixDocAccessFields_height_Create {
+type FormsDocAccessFields_emails_cc_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_height_Read {
+type FormsDocAccessFields_emails_cc_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_height_Update {
+type FormsDocAccessFields_emails_cc_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_height_Delete {
+type FormsDocAccessFields_emails_cc_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_focalX {
-  create: MediaWithPrefixDocAccessFields_focalX_Create
-  read: MediaWithPrefixDocAccessFields_focalX_Read
-  update: MediaWithPrefixDocAccessFields_focalX_Update
-  delete: MediaWithPrefixDocAccessFields_focalX_Delete
+type FormsDocAccessFields_emails_bcc {
+  create: FormsDocAccessFields_emails_bcc_Create
+  read: FormsDocAccessFields_emails_bcc_Read
+  update: FormsDocAccessFields_emails_bcc_Update
+  delete: FormsDocAccessFields_emails_bcc_Delete
 }
 
-type MediaWithPrefixDocAccessFields_focalX_Create {
+type FormsDocAccessFields_emails_bcc_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_focalX_Read {
+type FormsDocAccessFields_emails_bcc_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_focalX_Update {
+type FormsDocAccessFields_emails_bcc_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_focalX_Delete {
+type FormsDocAccessFields_emails_bcc_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_focalY {
-  create: MediaWithPrefixDocAccessFields_focalY_Create
-  read: MediaWithPrefixDocAccessFields_focalY_Read
-  update: MediaWithPrefixDocAccessFields_focalY_Update
-  delete: MediaWithPrefixDocAccessFields_focalY_Delete
+type FormsDocAccessFields_emails_replyTo {
+  create: FormsDocAccessFields_emails_replyTo_Create
+  read: FormsDocAccessFields_emails_replyTo_Read
+  update: FormsDocAccessFields_emails_replyTo_Update
+  delete: FormsDocAccessFields_emails_replyTo_Delete
 }
 
-type MediaWithPrefixDocAccessFields_focalY_Create {
+type FormsDocAccessFields_emails_replyTo_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_focalY_Read {
+type FormsDocAccessFields_emails_replyTo_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_focalY_Update {
+type FormsDocAccessFields_emails_replyTo_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixDocAccessFields_focalY_Delete {
+type FormsDocAccessFields_emails_replyTo_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixCreateDocAccess {
+type FormsDocAccessFields_emails_emailFrom {
+  create: FormsDocAccessFields_emails_emailFrom_Create
+  read: FormsDocAccessFields_emails_emailFrom_Read
+  update: FormsDocAccessFields_emails_emailFrom_Update
+  delete: FormsDocAccessFields_emails_emailFrom_Delete
+}
+
+type FormsDocAccessFields_emails_emailFrom_Create {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_emails_emailFrom_Read {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_emails_emailFrom_Update {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_emails_emailFrom_Delete {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_emails_subject {
+  create: FormsDocAccessFields_emails_subject_Create
+  read: FormsDocAccessFields_emails_subject_Read
+  update: FormsDocAccessFields_emails_subject_Update
+  delete: FormsDocAccessFields_emails_subject_Delete
+}
+
+type FormsDocAccessFields_emails_subject_Create {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_emails_subject_Read {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_emails_subject_Update {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_emails_subject_Delete {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_emails_message {
+  create: FormsDocAccessFields_emails_message_Create
+  read: FormsDocAccessFields_emails_message_Read
+  update: FormsDocAccessFields_emails_message_Update
+  delete: FormsDocAccessFields_emails_message_Delete
+}
+
+type FormsDocAccessFields_emails_message_Create {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_emails_message_Read {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_emails_message_Update {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_emails_message_Delete {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_emails_id {
+  create: FormsDocAccessFields_emails_id_Create
+  read: FormsDocAccessFields_emails_id_Read
+  update: FormsDocAccessFields_emails_id_Update
+  delete: FormsDocAccessFields_emails_id_Delete
+}
+
+type FormsDocAccessFields_emails_id_Create {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_emails_id_Read {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_emails_id_Update {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_emails_id_Delete {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_updatedAt {
+  create: FormsDocAccessFields_updatedAt_Create
+  read: FormsDocAccessFields_updatedAt_Read
+  update: FormsDocAccessFields_updatedAt_Update
+  delete: FormsDocAccessFields_updatedAt_Delete
+}
+
+type FormsDocAccessFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_createdAt {
+  create: FormsDocAccessFields_createdAt_Create
+  read: FormsDocAccessFields_createdAt_Read
+  update: FormsDocAccessFields_createdAt_Update
+  delete: FormsDocAccessFields_createdAt_Delete
+}
+
+type FormsDocAccessFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type FormsDocAccessFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type FormsCreateDocAccess {
   permission: Boolean!
   where: JSONObject
 }
 
-type MediaWithPrefixReadDocAccess {
+type FormsReadDocAccess {
   permission: Boolean!
   where: JSONObject
 }
 
-type MediaWithPrefixUpdateDocAccess {
+type FormsUpdateDocAccess {
   permission: Boolean!
   where: JSONObject
 }
 
-type MediaWithPrefixDeleteDocAccess {
+type FormsDeleteDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type FormSubmission {
+  id: Int!
+  form: Form!
+  submissionData: [FormSubmission_SubmissionData!]
+  updatedAt: DateTime
+  createdAt: DateTime
+}
+
+type FormSubmission_SubmissionData {
+  field: String
+  value: String
+  id: String
+}
+
+type FormSubmissions {
+  docs: [FormSubmission!]!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+  limit: Int!
+  nextPage: Int
+  offset: Int
+  page: Int!
+  pagingCounter: Int!
+  prevPage: Int
+  totalDocs: Int!
+  totalPages: Int!
+}
+
+input FormSubmission_where {
+  form: FormSubmission_form_operator
+  submissionData__field: FormSubmission_submissionData__field_operator
+  submissionData__value: FormSubmission_submissionData__value_operator
+  submissionData__id: FormSubmission_submissionData__id_operator
+  updatedAt: FormSubmission_updatedAt_operator
+  createdAt: FormSubmission_createdAt_operator
+  id: FormSubmission_id_operator
+  AND: [FormSubmission_where_and]
+  OR: [FormSubmission_where_or]
+}
+
+input FormSubmission_form_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+}
+
+input FormSubmission_submissionData__field_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+}
+
+input FormSubmission_submissionData__value_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+}
+
+input FormSubmission_submissionData__id_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+  exists: Boolean
+}
+
+input FormSubmission_updatedAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input FormSubmission_createdAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input FormSubmission_id_operator {
+  equals: Int
+  not_equals: Int
+  greater_than_equal: Int
+  greater_than: Int
+  less_than_equal: Int
+  less_than: Int
+  exists: Boolean
+}
+
+input FormSubmission_where_and {
+  form: FormSubmission_form_operator
+  submissionData__field: FormSubmission_submissionData__field_operator
+  submissionData__value: FormSubmission_submissionData__value_operator
+  submissionData__id: FormSubmission_submissionData__id_operator
+  updatedAt: FormSubmission_updatedAt_operator
+  createdAt: FormSubmission_createdAt_operator
+  id: FormSubmission_id_operator
+  AND: [FormSubmission_where_and]
+  OR: [FormSubmission_where_or]
+}
+
+input FormSubmission_where_or {
+  form: FormSubmission_form_operator
+  submissionData__field: FormSubmission_submissionData__field_operator
+  submissionData__value: FormSubmission_submissionData__value_operator
+  submissionData__id: FormSubmission_submissionData__id_operator
+  updatedAt: FormSubmission_updatedAt_operator
+  createdAt: FormSubmission_createdAt_operator
+  id: FormSubmission_id_operator
+  AND: [FormSubmission_where_and]
+  OR: [FormSubmission_where_or]
+}
+
+type countFormSubmissions {
+  totalDocs: Int
+}
+
+type form_submissionsDocAccess {
+  fields: FormSubmissionsDocAccessFields
+  create: FormSubmissionsCreateDocAccess
+  read: FormSubmissionsReadDocAccess
+  update: FormSubmissionsUpdateDocAccess
+  delete: FormSubmissionsDeleteDocAccess
+}
+
+type FormSubmissionsDocAccessFields {
+  form: FormSubmissionsDocAccessFields_form
+  submissionData: FormSubmissionsDocAccessFields_submissionData
+  updatedAt: FormSubmissionsDocAccessFields_updatedAt
+  createdAt: FormSubmissionsDocAccessFields_createdAt
+}
+
+type FormSubmissionsDocAccessFields_form {
+  create: FormSubmissionsDocAccessFields_form_Create
+  read: FormSubmissionsDocAccessFields_form_Read
+  update: FormSubmissionsDocAccessFields_form_Update
+  delete: FormSubmissionsDocAccessFields_form_Delete
+}
+
+type FormSubmissionsDocAccessFields_form_Create {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_form_Read {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_form_Update {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_form_Delete {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_submissionData {
+  create: FormSubmissionsDocAccessFields_submissionData_Create
+  read: FormSubmissionsDocAccessFields_submissionData_Read
+  update: FormSubmissionsDocAccessFields_submissionData_Update
+  delete: FormSubmissionsDocAccessFields_submissionData_Delete
+  fields: FormSubmissionsDocAccessFields_submissionData_Fields
+}
+
+type FormSubmissionsDocAccessFields_submissionData_Create {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_submissionData_Read {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_submissionData_Update {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_submissionData_Delete {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_submissionData_Fields {
+  field: FormSubmissionsDocAccessFields_submissionData_field
+  value: FormSubmissionsDocAccessFields_submissionData_value
+  id: FormSubmissionsDocAccessFields_submissionData_id
+}
+
+type FormSubmissionsDocAccessFields_submissionData_field {
+  create: FormSubmissionsDocAccessFields_submissionData_field_Create
+  read: FormSubmissionsDocAccessFields_submissionData_field_Read
+  update: FormSubmissionsDocAccessFields_submissionData_field_Update
+  delete: FormSubmissionsDocAccessFields_submissionData_field_Delete
+}
+
+type FormSubmissionsDocAccessFields_submissionData_field_Create {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_submissionData_field_Read {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_submissionData_field_Update {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_submissionData_field_Delete {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_submissionData_value {
+  create: FormSubmissionsDocAccessFields_submissionData_value_Create
+  read: FormSubmissionsDocAccessFields_submissionData_value_Read
+  update: FormSubmissionsDocAccessFields_submissionData_value_Update
+  delete: FormSubmissionsDocAccessFields_submissionData_value_Delete
+}
+
+type FormSubmissionsDocAccessFields_submissionData_value_Create {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_submissionData_value_Read {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_submissionData_value_Update {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_submissionData_value_Delete {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_submissionData_id {
+  create: FormSubmissionsDocAccessFields_submissionData_id_Create
+  read: FormSubmissionsDocAccessFields_submissionData_id_Read
+  update: FormSubmissionsDocAccessFields_submissionData_id_Update
+  delete: FormSubmissionsDocAccessFields_submissionData_id_Delete
+}
+
+type FormSubmissionsDocAccessFields_submissionData_id_Create {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_submissionData_id_Read {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_submissionData_id_Update {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_submissionData_id_Delete {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_updatedAt {
+  create: FormSubmissionsDocAccessFields_updatedAt_Create
+  read: FormSubmissionsDocAccessFields_updatedAt_Read
+  update: FormSubmissionsDocAccessFields_updatedAt_Update
+  delete: FormSubmissionsDocAccessFields_updatedAt_Delete
+}
+
+type FormSubmissionsDocAccessFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_createdAt {
+  create: FormSubmissionsDocAccessFields_createdAt_Create
+  read: FormSubmissionsDocAccessFields_createdAt_Read
+  update: FormSubmissionsDocAccessFields_createdAt_Update
+  delete: FormSubmissionsDocAccessFields_createdAt_Delete
+}
+
+type FormSubmissionsDocAccessFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type FormSubmissionsDocAccessFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type FormSubmissionsCreateDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type FormSubmissionsReadDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type FormSubmissionsUpdateDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type FormSubmissionsDeleteDocAccess {
   permission: Boolean!
   where: JSONObject
 }
@@ -3044,6 +5109,296 @@ type PayloadKvDeleteDocAccess {
   where: JSONObject
 }
 
+type PayloadFolders {
+  docs: [PayloadFolder!]!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+  limit: Int!
+  nextPage: Int
+  offset: Int
+  page: Int!
+  pagingCounter: Int!
+  prevPage: Int
+  totalDocs: Int!
+  totalPages: Int!
+}
+
+input PayloadFolder_where {
+  name: PayloadFolder_name_operator
+  folder: PayloadFolder_folder_operator
+  folderType: PayloadFolder_folderType_operator
+  updatedAt: PayloadFolder_updatedAt_operator
+  createdAt: PayloadFolder_createdAt_operator
+  id: PayloadFolder_id_operator
+  AND: [PayloadFolder_where_and]
+  OR: [PayloadFolder_where_or]
+}
+
+input PayloadFolder_name_operator {
+  equals: String
+  not_equals: String
+  like: String
+  contains: String
+  in: [String]
+  not_in: [String]
+  all: [String]
+}
+
+input PayloadFolder_folder_operator {
+  equals: JSON
+  not_equals: JSON
+  in: [JSON]
+  not_in: [JSON]
+  all: [JSON]
+  exists: Boolean
+}
+
+input PayloadFolder_folderType_operator {
+  equals: PayloadFolder_folderType_Input
+  not_equals: PayloadFolder_folderType_Input
+  in: [PayloadFolder_folderType_Input]
+  not_in: [PayloadFolder_folderType_Input]
+  all: [PayloadFolder_folderType_Input]
+  exists: Boolean
+}
+
+enum PayloadFolder_folderType_Input {
+  media
+}
+
+input PayloadFolder_updatedAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input PayloadFolder_createdAt_operator {
+  equals: DateTime
+  not_equals: DateTime
+  greater_than_equal: DateTime
+  greater_than: DateTime
+  less_than_equal: DateTime
+  less_than: DateTime
+  like: DateTime
+  exists: Boolean
+}
+
+input PayloadFolder_id_operator {
+  equals: Int
+  not_equals: Int
+  greater_than_equal: Int
+  greater_than: Int
+  less_than_equal: Int
+  less_than: Int
+  exists: Boolean
+}
+
+input PayloadFolder_where_and {
+  name: PayloadFolder_name_operator
+  folder: PayloadFolder_folder_operator
+  folderType: PayloadFolder_folderType_operator
+  updatedAt: PayloadFolder_updatedAt_operator
+  createdAt: PayloadFolder_createdAt_operator
+  id: PayloadFolder_id_operator
+  AND: [PayloadFolder_where_and]
+  OR: [PayloadFolder_where_or]
+}
+
+input PayloadFolder_where_or {
+  name: PayloadFolder_name_operator
+  folder: PayloadFolder_folder_operator
+  folderType: PayloadFolder_folderType_operator
+  updatedAt: PayloadFolder_updatedAt_operator
+  createdAt: PayloadFolder_createdAt_operator
+  id: PayloadFolder_id_operator
+  AND: [PayloadFolder_where_and]
+  OR: [PayloadFolder_where_or]
+}
+
+type countPayloadFolders {
+  totalDocs: Int
+}
+
+type payload_foldersDocAccess {
+  fields: PayloadFoldersDocAccessFields
+  create: PayloadFoldersCreateDocAccess
+  read: PayloadFoldersReadDocAccess
+  update: PayloadFoldersUpdateDocAccess
+  delete: PayloadFoldersDeleteDocAccess
+}
+
+type PayloadFoldersDocAccessFields {
+  name: PayloadFoldersDocAccessFields_name
+  folder: PayloadFoldersDocAccessFields_folder
+  documentsAndFolders: PayloadFoldersDocAccessFields_documentsAndFolders
+  folderType: PayloadFoldersDocAccessFields_folderType
+  updatedAt: PayloadFoldersDocAccessFields_updatedAt
+  createdAt: PayloadFoldersDocAccessFields_createdAt
+}
+
+type PayloadFoldersDocAccessFields_name {
+  create: PayloadFoldersDocAccessFields_name_Create
+  read: PayloadFoldersDocAccessFields_name_Read
+  update: PayloadFoldersDocAccessFields_name_Update
+  delete: PayloadFoldersDocAccessFields_name_Delete
+}
+
+type PayloadFoldersDocAccessFields_name_Create {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_name_Read {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_name_Update {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_name_Delete {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_folder {
+  create: PayloadFoldersDocAccessFields_folder_Create
+  read: PayloadFoldersDocAccessFields_folder_Read
+  update: PayloadFoldersDocAccessFields_folder_Update
+  delete: PayloadFoldersDocAccessFields_folder_Delete
+}
+
+type PayloadFoldersDocAccessFields_folder_Create {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_folder_Read {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_folder_Update {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_folder_Delete {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_documentsAndFolders {
+  create: PayloadFoldersDocAccessFields_documentsAndFolders_Create
+  read: PayloadFoldersDocAccessFields_documentsAndFolders_Read
+  update: PayloadFoldersDocAccessFields_documentsAndFolders_Update
+  delete: PayloadFoldersDocAccessFields_documentsAndFolders_Delete
+}
+
+type PayloadFoldersDocAccessFields_documentsAndFolders_Create {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_documentsAndFolders_Read {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_documentsAndFolders_Update {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_documentsAndFolders_Delete {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_folderType {
+  create: PayloadFoldersDocAccessFields_folderType_Create
+  read: PayloadFoldersDocAccessFields_folderType_Read
+  update: PayloadFoldersDocAccessFields_folderType_Update
+  delete: PayloadFoldersDocAccessFields_folderType_Delete
+}
+
+type PayloadFoldersDocAccessFields_folderType_Create {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_folderType_Read {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_folderType_Update {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_folderType_Delete {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_updatedAt {
+  create: PayloadFoldersDocAccessFields_updatedAt_Create
+  read: PayloadFoldersDocAccessFields_updatedAt_Read
+  update: PayloadFoldersDocAccessFields_updatedAt_Update
+  delete: PayloadFoldersDocAccessFields_updatedAt_Delete
+}
+
+type PayloadFoldersDocAccessFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_createdAt {
+  create: PayloadFoldersDocAccessFields_createdAt_Create
+  read: PayloadFoldersDocAccessFields_createdAt_Read
+  update: PayloadFoldersDocAccessFields_createdAt_Update
+  delete: PayloadFoldersDocAccessFields_createdAt_Delete
+}
+
+type PayloadFoldersDocAccessFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type PayloadFoldersDocAccessFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type PayloadFoldersCreateDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type PayloadFoldersReadDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type PayloadFoldersUpdateDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type PayloadFoldersDeleteDocAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
 type PayloadLockedDocument {
   id: Int!
   document: PayloadLockedDocument_Document_Relationship
@@ -3063,10 +5418,12 @@ enum PayloadLockedDocument_Document_RelationTo {
   users
   tenants
   media
-  media_with_prefix
+  forms
+  form_submissions
+  payload_folders
 }
 
-union PayloadLockedDocument_Document = Page | User | Tenant | Media | MediaWithPrefix
+union PayloadLockedDocument_Document = Page | User | Tenant | Media | Form | FormSubmission | PayloadFolder
 
 type PayloadLockedDocument_User_Relationship {
   relationTo: PayloadLockedDocument_User_RelationTo
@@ -3114,7 +5471,9 @@ enum PayloadLockedDocument_document_Relation_RelationTo {
   users
   tenants
   media
-  media_with_prefix
+  forms
+  form_submissions
+  payload_folders
 }
 
 input PayloadLockedDocument_globalSlug_operator {
@@ -3636,8 +5995,10 @@ type Access {
   users: usersAccess
   tenants: tenantsAccess
   media: mediaAccess
-  media_with_prefix: media_with_prefixAccess
+  forms: formsAccess
+  form_submissions: form_submissionsAccess
   payload_kv: payload_kvAccess
+  payload_folders: payload_foldersAccess
   payload_locked_documents: payload_locked_documentsAccess
   payload_preferences: payload_preferencesAccess
 }
@@ -4335,6 +6696,8 @@ type mediaAccess {
 
 type MediaFields {
   alt: MediaFields_alt
+  caption: MediaFields_caption
+  folder: MediaFields_folder
   updatedAt: MediaFields_updatedAt
   createdAt: MediaFields_createdAt
   url: MediaFields_url
@@ -4369,6 +6732,52 @@ type MediaFields_alt_Update {
 }
 
 type MediaFields_alt_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_caption {
+  create: MediaFields_caption_Create
+  read: MediaFields_caption_Read
+  update: MediaFields_caption_Update
+  delete: MediaFields_caption_Delete
+}
+
+type MediaFields_caption_Create {
+  permission: Boolean!
+}
+
+type MediaFields_caption_Read {
+  permission: Boolean!
+}
+
+type MediaFields_caption_Update {
+  permission: Boolean!
+}
+
+type MediaFields_caption_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_folder {
+  create: MediaFields_folder_Create
+  read: MediaFields_folder_Read
+  update: MediaFields_folder_Update
+  delete: MediaFields_folder_Delete
+}
+
+type MediaFields_folder_Create {
+  permission: Boolean!
+}
+
+type MediaFields_folder_Read {
+  permission: Boolean!
+}
+
+type MediaFields_folder_Update {
+  permission: Boolean!
+}
+
+type MediaFields_folder_Delete {
   permission: Boolean!
 }
 
@@ -4650,8 +7059,184 @@ type MediaFields_sizes_Delete {
 }
 
 type MediaFields_sizes_Fields {
+  thumbnail: MediaFields_sizes_thumbnail
   square: MediaFields_sizes_square
-  sixteenByNineMedium: MediaFields_sizes_sixteenByNineMedium
+  small: MediaFields_sizes_small
+  medium: MediaFields_sizes_medium
+  large: MediaFields_sizes_large
+  xlarge: MediaFields_sizes_xlarge
+  og: MediaFields_sizes_og
+}
+
+type MediaFields_sizes_thumbnail {
+  create: MediaFields_sizes_thumbnail_Create
+  read: MediaFields_sizes_thumbnail_Read
+  update: MediaFields_sizes_thumbnail_Update
+  delete: MediaFields_sizes_thumbnail_Delete
+  fields: MediaFields_sizes_thumbnail_Fields
+}
+
+type MediaFields_sizes_thumbnail_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_Fields {
+  url: MediaFields_sizes_thumbnail_url
+  width: MediaFields_sizes_thumbnail_width
+  height: MediaFields_sizes_thumbnail_height
+  mimeType: MediaFields_sizes_thumbnail_mimeType
+  filesize: MediaFields_sizes_thumbnail_filesize
+  filename: MediaFields_sizes_thumbnail_filename
+}
+
+type MediaFields_sizes_thumbnail_url {
+  create: MediaFields_sizes_thumbnail_url_Create
+  read: MediaFields_sizes_thumbnail_url_Read
+  update: MediaFields_sizes_thumbnail_url_Update
+  delete: MediaFields_sizes_thumbnail_url_Delete
+}
+
+type MediaFields_sizes_thumbnail_url_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_url_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_url_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_url_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_width {
+  create: MediaFields_sizes_thumbnail_width_Create
+  read: MediaFields_sizes_thumbnail_width_Read
+  update: MediaFields_sizes_thumbnail_width_Update
+  delete: MediaFields_sizes_thumbnail_width_Delete
+}
+
+type MediaFields_sizes_thumbnail_width_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_width_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_width_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_width_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_height {
+  create: MediaFields_sizes_thumbnail_height_Create
+  read: MediaFields_sizes_thumbnail_height_Read
+  update: MediaFields_sizes_thumbnail_height_Update
+  delete: MediaFields_sizes_thumbnail_height_Delete
+}
+
+type MediaFields_sizes_thumbnail_height_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_height_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_height_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_height_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_mimeType {
+  create: MediaFields_sizes_thumbnail_mimeType_Create
+  read: MediaFields_sizes_thumbnail_mimeType_Read
+  update: MediaFields_sizes_thumbnail_mimeType_Update
+  delete: MediaFields_sizes_thumbnail_mimeType_Delete
+}
+
+type MediaFields_sizes_thumbnail_mimeType_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_mimeType_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_mimeType_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_mimeType_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_filesize {
+  create: MediaFields_sizes_thumbnail_filesize_Create
+  read: MediaFields_sizes_thumbnail_filesize_Read
+  update: MediaFields_sizes_thumbnail_filesize_Update
+  delete: MediaFields_sizes_thumbnail_filesize_Delete
+}
+
+type MediaFields_sizes_thumbnail_filesize_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_filesize_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_filesize_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_filesize_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_filename {
+  create: MediaFields_sizes_thumbnail_filename_Create
+  read: MediaFields_sizes_thumbnail_filename_Read
+  update: MediaFields_sizes_thumbnail_filename_Update
+  delete: MediaFields_sizes_thumbnail_filename_Delete
+}
+
+type MediaFields_sizes_thumbnail_filename_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_filename_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_filename_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_thumbnail_filename_Delete {
+  permission: Boolean!
 }
 
 type MediaFields_sizes_square {
@@ -4825,174 +7410,858 @@ type MediaFields_sizes_square_filename_Delete {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium {
-  create: MediaFields_sizes_sixteenByNineMedium_Create
-  read: MediaFields_sizes_sixteenByNineMedium_Read
-  update: MediaFields_sizes_sixteenByNineMedium_Update
-  delete: MediaFields_sizes_sixteenByNineMedium_Delete
-  fields: MediaFields_sizes_sixteenByNineMedium_Fields
+type MediaFields_sizes_small {
+  create: MediaFields_sizes_small_Create
+  read: MediaFields_sizes_small_Read
+  update: MediaFields_sizes_small_Update
+  delete: MediaFields_sizes_small_Delete
+  fields: MediaFields_sizes_small_Fields
 }
 
-type MediaFields_sizes_sixteenByNineMedium_Create {
+type MediaFields_sizes_small_Create {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_Read {
+type MediaFields_sizes_small_Read {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_Update {
+type MediaFields_sizes_small_Update {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_Delete {
+type MediaFields_sizes_small_Delete {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_Fields {
-  url: MediaFields_sizes_sixteenByNineMedium_url
-  width: MediaFields_sizes_sixteenByNineMedium_width
-  height: MediaFields_sizes_sixteenByNineMedium_height
-  mimeType: MediaFields_sizes_sixteenByNineMedium_mimeType
-  filesize: MediaFields_sizes_sixteenByNineMedium_filesize
-  filename: MediaFields_sizes_sixteenByNineMedium_filename
+type MediaFields_sizes_small_Fields {
+  url: MediaFields_sizes_small_url
+  width: MediaFields_sizes_small_width
+  height: MediaFields_sizes_small_height
+  mimeType: MediaFields_sizes_small_mimeType
+  filesize: MediaFields_sizes_small_filesize
+  filename: MediaFields_sizes_small_filename
 }
 
-type MediaFields_sizes_sixteenByNineMedium_url {
-  create: MediaFields_sizes_sixteenByNineMedium_url_Create
-  read: MediaFields_sizes_sixteenByNineMedium_url_Read
-  update: MediaFields_sizes_sixteenByNineMedium_url_Update
-  delete: MediaFields_sizes_sixteenByNineMedium_url_Delete
+type MediaFields_sizes_small_url {
+  create: MediaFields_sizes_small_url_Create
+  read: MediaFields_sizes_small_url_Read
+  update: MediaFields_sizes_small_url_Update
+  delete: MediaFields_sizes_small_url_Delete
 }
 
-type MediaFields_sizes_sixteenByNineMedium_url_Create {
+type MediaFields_sizes_small_url_Create {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_url_Read {
+type MediaFields_sizes_small_url_Read {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_url_Update {
+type MediaFields_sizes_small_url_Update {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_url_Delete {
+type MediaFields_sizes_small_url_Delete {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_width {
-  create: MediaFields_sizes_sixteenByNineMedium_width_Create
-  read: MediaFields_sizes_sixteenByNineMedium_width_Read
-  update: MediaFields_sizes_sixteenByNineMedium_width_Update
-  delete: MediaFields_sizes_sixteenByNineMedium_width_Delete
+type MediaFields_sizes_small_width {
+  create: MediaFields_sizes_small_width_Create
+  read: MediaFields_sizes_small_width_Read
+  update: MediaFields_sizes_small_width_Update
+  delete: MediaFields_sizes_small_width_Delete
 }
 
-type MediaFields_sizes_sixteenByNineMedium_width_Create {
+type MediaFields_sizes_small_width_Create {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_width_Read {
+type MediaFields_sizes_small_width_Read {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_width_Update {
+type MediaFields_sizes_small_width_Update {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_width_Delete {
+type MediaFields_sizes_small_width_Delete {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_height {
-  create: MediaFields_sizes_sixteenByNineMedium_height_Create
-  read: MediaFields_sizes_sixteenByNineMedium_height_Read
-  update: MediaFields_sizes_sixteenByNineMedium_height_Update
-  delete: MediaFields_sizes_sixteenByNineMedium_height_Delete
+type MediaFields_sizes_small_height {
+  create: MediaFields_sizes_small_height_Create
+  read: MediaFields_sizes_small_height_Read
+  update: MediaFields_sizes_small_height_Update
+  delete: MediaFields_sizes_small_height_Delete
 }
 
-type MediaFields_sizes_sixteenByNineMedium_height_Create {
+type MediaFields_sizes_small_height_Create {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_height_Read {
+type MediaFields_sizes_small_height_Read {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_height_Update {
+type MediaFields_sizes_small_height_Update {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_height_Delete {
+type MediaFields_sizes_small_height_Delete {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_mimeType {
-  create: MediaFields_sizes_sixteenByNineMedium_mimeType_Create
-  read: MediaFields_sizes_sixteenByNineMedium_mimeType_Read
-  update: MediaFields_sizes_sixteenByNineMedium_mimeType_Update
-  delete: MediaFields_sizes_sixteenByNineMedium_mimeType_Delete
+type MediaFields_sizes_small_mimeType {
+  create: MediaFields_sizes_small_mimeType_Create
+  read: MediaFields_sizes_small_mimeType_Read
+  update: MediaFields_sizes_small_mimeType_Update
+  delete: MediaFields_sizes_small_mimeType_Delete
 }
 
-type MediaFields_sizes_sixteenByNineMedium_mimeType_Create {
+type MediaFields_sizes_small_mimeType_Create {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_mimeType_Read {
+type MediaFields_sizes_small_mimeType_Read {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_mimeType_Update {
+type MediaFields_sizes_small_mimeType_Update {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_mimeType_Delete {
+type MediaFields_sizes_small_mimeType_Delete {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_filesize {
-  create: MediaFields_sizes_sixteenByNineMedium_filesize_Create
-  read: MediaFields_sizes_sixteenByNineMedium_filesize_Read
-  update: MediaFields_sizes_sixteenByNineMedium_filesize_Update
-  delete: MediaFields_sizes_sixteenByNineMedium_filesize_Delete
+type MediaFields_sizes_small_filesize {
+  create: MediaFields_sizes_small_filesize_Create
+  read: MediaFields_sizes_small_filesize_Read
+  update: MediaFields_sizes_small_filesize_Update
+  delete: MediaFields_sizes_small_filesize_Delete
 }
 
-type MediaFields_sizes_sixteenByNineMedium_filesize_Create {
+type MediaFields_sizes_small_filesize_Create {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_filesize_Read {
+type MediaFields_sizes_small_filesize_Read {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_filesize_Update {
+type MediaFields_sizes_small_filesize_Update {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_filesize_Delete {
+type MediaFields_sizes_small_filesize_Delete {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_filename {
-  create: MediaFields_sizes_sixteenByNineMedium_filename_Create
-  read: MediaFields_sizes_sixteenByNineMedium_filename_Read
-  update: MediaFields_sizes_sixteenByNineMedium_filename_Update
-  delete: MediaFields_sizes_sixteenByNineMedium_filename_Delete
+type MediaFields_sizes_small_filename {
+  create: MediaFields_sizes_small_filename_Create
+  read: MediaFields_sizes_small_filename_Read
+  update: MediaFields_sizes_small_filename_Update
+  delete: MediaFields_sizes_small_filename_Delete
 }
 
-type MediaFields_sizes_sixteenByNineMedium_filename_Create {
+type MediaFields_sizes_small_filename_Create {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_filename_Read {
+type MediaFields_sizes_small_filename_Read {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_filename_Update {
+type MediaFields_sizes_small_filename_Update {
   permission: Boolean!
 }
 
-type MediaFields_sizes_sixteenByNineMedium_filename_Delete {
+type MediaFields_sizes_small_filename_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium {
+  create: MediaFields_sizes_medium_Create
+  read: MediaFields_sizes_medium_Read
+  update: MediaFields_sizes_medium_Update
+  delete: MediaFields_sizes_medium_Delete
+  fields: MediaFields_sizes_medium_Fields
+}
+
+type MediaFields_sizes_medium_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_Fields {
+  url: MediaFields_sizes_medium_url
+  width: MediaFields_sizes_medium_width
+  height: MediaFields_sizes_medium_height
+  mimeType: MediaFields_sizes_medium_mimeType
+  filesize: MediaFields_sizes_medium_filesize
+  filename: MediaFields_sizes_medium_filename
+}
+
+type MediaFields_sizes_medium_url {
+  create: MediaFields_sizes_medium_url_Create
+  read: MediaFields_sizes_medium_url_Read
+  update: MediaFields_sizes_medium_url_Update
+  delete: MediaFields_sizes_medium_url_Delete
+}
+
+type MediaFields_sizes_medium_url_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_url_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_url_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_url_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_width {
+  create: MediaFields_sizes_medium_width_Create
+  read: MediaFields_sizes_medium_width_Read
+  update: MediaFields_sizes_medium_width_Update
+  delete: MediaFields_sizes_medium_width_Delete
+}
+
+type MediaFields_sizes_medium_width_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_width_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_width_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_width_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_height {
+  create: MediaFields_sizes_medium_height_Create
+  read: MediaFields_sizes_medium_height_Read
+  update: MediaFields_sizes_medium_height_Update
+  delete: MediaFields_sizes_medium_height_Delete
+}
+
+type MediaFields_sizes_medium_height_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_height_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_height_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_height_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_mimeType {
+  create: MediaFields_sizes_medium_mimeType_Create
+  read: MediaFields_sizes_medium_mimeType_Read
+  update: MediaFields_sizes_medium_mimeType_Update
+  delete: MediaFields_sizes_medium_mimeType_Delete
+}
+
+type MediaFields_sizes_medium_mimeType_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_mimeType_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_mimeType_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_mimeType_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_filesize {
+  create: MediaFields_sizes_medium_filesize_Create
+  read: MediaFields_sizes_medium_filesize_Read
+  update: MediaFields_sizes_medium_filesize_Update
+  delete: MediaFields_sizes_medium_filesize_Delete
+}
+
+type MediaFields_sizes_medium_filesize_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_filesize_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_filesize_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_filesize_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_filename {
+  create: MediaFields_sizes_medium_filename_Create
+  read: MediaFields_sizes_medium_filename_Read
+  update: MediaFields_sizes_medium_filename_Update
+  delete: MediaFields_sizes_medium_filename_Delete
+}
+
+type MediaFields_sizes_medium_filename_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_filename_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_filename_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_medium_filename_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large {
+  create: MediaFields_sizes_large_Create
+  read: MediaFields_sizes_large_Read
+  update: MediaFields_sizes_large_Update
+  delete: MediaFields_sizes_large_Delete
+  fields: MediaFields_sizes_large_Fields
+}
+
+type MediaFields_sizes_large_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_Fields {
+  url: MediaFields_sizes_large_url
+  width: MediaFields_sizes_large_width
+  height: MediaFields_sizes_large_height
+  mimeType: MediaFields_sizes_large_mimeType
+  filesize: MediaFields_sizes_large_filesize
+  filename: MediaFields_sizes_large_filename
+}
+
+type MediaFields_sizes_large_url {
+  create: MediaFields_sizes_large_url_Create
+  read: MediaFields_sizes_large_url_Read
+  update: MediaFields_sizes_large_url_Update
+  delete: MediaFields_sizes_large_url_Delete
+}
+
+type MediaFields_sizes_large_url_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_url_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_url_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_url_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_width {
+  create: MediaFields_sizes_large_width_Create
+  read: MediaFields_sizes_large_width_Read
+  update: MediaFields_sizes_large_width_Update
+  delete: MediaFields_sizes_large_width_Delete
+}
+
+type MediaFields_sizes_large_width_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_width_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_width_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_width_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_height {
+  create: MediaFields_sizes_large_height_Create
+  read: MediaFields_sizes_large_height_Read
+  update: MediaFields_sizes_large_height_Update
+  delete: MediaFields_sizes_large_height_Delete
+}
+
+type MediaFields_sizes_large_height_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_height_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_height_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_height_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_mimeType {
+  create: MediaFields_sizes_large_mimeType_Create
+  read: MediaFields_sizes_large_mimeType_Read
+  update: MediaFields_sizes_large_mimeType_Update
+  delete: MediaFields_sizes_large_mimeType_Delete
+}
+
+type MediaFields_sizes_large_mimeType_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_mimeType_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_mimeType_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_mimeType_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_filesize {
+  create: MediaFields_sizes_large_filesize_Create
+  read: MediaFields_sizes_large_filesize_Read
+  update: MediaFields_sizes_large_filesize_Update
+  delete: MediaFields_sizes_large_filesize_Delete
+}
+
+type MediaFields_sizes_large_filesize_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_filesize_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_filesize_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_filesize_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_filename {
+  create: MediaFields_sizes_large_filename_Create
+  read: MediaFields_sizes_large_filename_Read
+  update: MediaFields_sizes_large_filename_Update
+  delete: MediaFields_sizes_large_filename_Delete
+}
+
+type MediaFields_sizes_large_filename_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_filename_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_filename_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_large_filename_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge {
+  create: MediaFields_sizes_xlarge_Create
+  read: MediaFields_sizes_xlarge_Read
+  update: MediaFields_sizes_xlarge_Update
+  delete: MediaFields_sizes_xlarge_Delete
+  fields: MediaFields_sizes_xlarge_Fields
+}
+
+type MediaFields_sizes_xlarge_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_Fields {
+  url: MediaFields_sizes_xlarge_url
+  width: MediaFields_sizes_xlarge_width
+  height: MediaFields_sizes_xlarge_height
+  mimeType: MediaFields_sizes_xlarge_mimeType
+  filesize: MediaFields_sizes_xlarge_filesize
+  filename: MediaFields_sizes_xlarge_filename
+}
+
+type MediaFields_sizes_xlarge_url {
+  create: MediaFields_sizes_xlarge_url_Create
+  read: MediaFields_sizes_xlarge_url_Read
+  update: MediaFields_sizes_xlarge_url_Update
+  delete: MediaFields_sizes_xlarge_url_Delete
+}
+
+type MediaFields_sizes_xlarge_url_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_url_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_url_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_url_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_width {
+  create: MediaFields_sizes_xlarge_width_Create
+  read: MediaFields_sizes_xlarge_width_Read
+  update: MediaFields_sizes_xlarge_width_Update
+  delete: MediaFields_sizes_xlarge_width_Delete
+}
+
+type MediaFields_sizes_xlarge_width_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_width_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_width_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_width_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_height {
+  create: MediaFields_sizes_xlarge_height_Create
+  read: MediaFields_sizes_xlarge_height_Read
+  update: MediaFields_sizes_xlarge_height_Update
+  delete: MediaFields_sizes_xlarge_height_Delete
+}
+
+type MediaFields_sizes_xlarge_height_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_height_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_height_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_height_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_mimeType {
+  create: MediaFields_sizes_xlarge_mimeType_Create
+  read: MediaFields_sizes_xlarge_mimeType_Read
+  update: MediaFields_sizes_xlarge_mimeType_Update
+  delete: MediaFields_sizes_xlarge_mimeType_Delete
+}
+
+type MediaFields_sizes_xlarge_mimeType_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_mimeType_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_mimeType_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_mimeType_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_filesize {
+  create: MediaFields_sizes_xlarge_filesize_Create
+  read: MediaFields_sizes_xlarge_filesize_Read
+  update: MediaFields_sizes_xlarge_filesize_Update
+  delete: MediaFields_sizes_xlarge_filesize_Delete
+}
+
+type MediaFields_sizes_xlarge_filesize_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_filesize_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_filesize_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_filesize_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_filename {
+  create: MediaFields_sizes_xlarge_filename_Create
+  read: MediaFields_sizes_xlarge_filename_Read
+  update: MediaFields_sizes_xlarge_filename_Update
+  delete: MediaFields_sizes_xlarge_filename_Delete
+}
+
+type MediaFields_sizes_xlarge_filename_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_filename_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_filename_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_xlarge_filename_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og {
+  create: MediaFields_sizes_og_Create
+  read: MediaFields_sizes_og_Read
+  update: MediaFields_sizes_og_Update
+  delete: MediaFields_sizes_og_Delete
+  fields: MediaFields_sizes_og_Fields
+}
+
+type MediaFields_sizes_og_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_Fields {
+  url: MediaFields_sizes_og_url
+  width: MediaFields_sizes_og_width
+  height: MediaFields_sizes_og_height
+  mimeType: MediaFields_sizes_og_mimeType
+  filesize: MediaFields_sizes_og_filesize
+  filename: MediaFields_sizes_og_filename
+}
+
+type MediaFields_sizes_og_url {
+  create: MediaFields_sizes_og_url_Create
+  read: MediaFields_sizes_og_url_Read
+  update: MediaFields_sizes_og_url_Update
+  delete: MediaFields_sizes_og_url_Delete
+}
+
+type MediaFields_sizes_og_url_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_url_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_url_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_url_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_width {
+  create: MediaFields_sizes_og_width_Create
+  read: MediaFields_sizes_og_width_Read
+  update: MediaFields_sizes_og_width_Update
+  delete: MediaFields_sizes_og_width_Delete
+}
+
+type MediaFields_sizes_og_width_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_width_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_width_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_width_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_height {
+  create: MediaFields_sizes_og_height_Create
+  read: MediaFields_sizes_og_height_Read
+  update: MediaFields_sizes_og_height_Update
+  delete: MediaFields_sizes_og_height_Delete
+}
+
+type MediaFields_sizes_og_height_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_height_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_height_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_height_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_mimeType {
+  create: MediaFields_sizes_og_mimeType_Create
+  read: MediaFields_sizes_og_mimeType_Read
+  update: MediaFields_sizes_og_mimeType_Update
+  delete: MediaFields_sizes_og_mimeType_Delete
+}
+
+type MediaFields_sizes_og_mimeType_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_mimeType_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_mimeType_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_mimeType_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_filesize {
+  create: MediaFields_sizes_og_filesize_Create
+  read: MediaFields_sizes_og_filesize_Read
+  update: MediaFields_sizes_og_filesize_Update
+  delete: MediaFields_sizes_og_filesize_Delete
+}
+
+type MediaFields_sizes_og_filesize_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_filesize_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_filesize_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_filesize_Delete {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_filename {
+  create: MediaFields_sizes_og_filename_Create
+  read: MediaFields_sizes_og_filename_Read
+  update: MediaFields_sizes_og_filename_Update
+  delete: MediaFields_sizes_og_filename_Delete
+}
+
+type MediaFields_sizes_og_filename_Create {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_filename_Read {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_filename_Update {
+  permission: Boolean!
+}
+
+type MediaFields_sizes_og_filename_Delete {
   permission: Boolean!
 }
 
@@ -5016,321 +8285,676 @@ type MediaDeleteAccess {
   where: JSONObject
 }
 
-type media_with_prefixAccess {
-  fields: MediaWithPrefixFields
-  create: MediaWithPrefixCreateAccess
-  read: MediaWithPrefixReadAccess
-  update: MediaWithPrefixUpdateAccess
-  delete: MediaWithPrefixDeleteAccess
+type formsAccess {
+  fields: FormsFields
+  create: FormsCreateAccess
+  read: FormsReadAccess
+  update: FormsUpdateAccess
+  delete: FormsDeleteAccess
 }
 
-type MediaWithPrefixFields {
-  prefix: MediaWithPrefixFields_prefix
-  updatedAt: MediaWithPrefixFields_updatedAt
-  createdAt: MediaWithPrefixFields_createdAt
-  url: MediaWithPrefixFields_url
-  thumbnailURL: MediaWithPrefixFields_thumbnailURL
-  filename: MediaWithPrefixFields_filename
-  mimeType: MediaWithPrefixFields_mimeType
-  filesize: MediaWithPrefixFields_filesize
-  width: MediaWithPrefixFields_width
-  height: MediaWithPrefixFields_height
-  focalX: MediaWithPrefixFields_focalX
-  focalY: MediaWithPrefixFields_focalY
+type FormsFields {
+  title: FormsFields_title
+  fields: FormsFields_fields
+  submitButtonLabel: FormsFields_submitButtonLabel
+  confirmationType: FormsFields_confirmationType
+  confirmationMessage: FormsFields_confirmationMessage
+  redirect: FormsFields_redirect
+  emails: FormsFields_emails
+  updatedAt: FormsFields_updatedAt
+  createdAt: FormsFields_createdAt
 }
 
-type MediaWithPrefixFields_prefix {
-  create: MediaWithPrefixFields_prefix_Create
-  read: MediaWithPrefixFields_prefix_Read
-  update: MediaWithPrefixFields_prefix_Update
-  delete: MediaWithPrefixFields_prefix_Delete
+type FormsFields_title {
+  create: FormsFields_title_Create
+  read: FormsFields_title_Read
+  update: FormsFields_title_Update
+  delete: FormsFields_title_Delete
 }
 
-type MediaWithPrefixFields_prefix_Create {
+type FormsFields_title_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_prefix_Read {
+type FormsFields_title_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_prefix_Update {
+type FormsFields_title_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_prefix_Delete {
+type FormsFields_title_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_updatedAt {
-  create: MediaWithPrefixFields_updatedAt_Create
-  read: MediaWithPrefixFields_updatedAt_Read
-  update: MediaWithPrefixFields_updatedAt_Update
-  delete: MediaWithPrefixFields_updatedAt_Delete
+type FormsFields_fields {
+  create: FormsFields_fields_Create
+  read: FormsFields_fields_Read
+  update: FormsFields_fields_Update
+  delete: FormsFields_fields_Delete
 }
 
-type MediaWithPrefixFields_updatedAt_Create {
+type FormsFields_fields_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_updatedAt_Read {
+type FormsFields_fields_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_updatedAt_Update {
+type FormsFields_fields_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_updatedAt_Delete {
+type FormsFields_fields_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_createdAt {
-  create: MediaWithPrefixFields_createdAt_Create
-  read: MediaWithPrefixFields_createdAt_Read
-  update: MediaWithPrefixFields_createdAt_Update
-  delete: MediaWithPrefixFields_createdAt_Delete
+type FormsFields_submitButtonLabel {
+  create: FormsFields_submitButtonLabel_Create
+  read: FormsFields_submitButtonLabel_Read
+  update: FormsFields_submitButtonLabel_Update
+  delete: FormsFields_submitButtonLabel_Delete
 }
 
-type MediaWithPrefixFields_createdAt_Create {
+type FormsFields_submitButtonLabel_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_createdAt_Read {
+type FormsFields_submitButtonLabel_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_createdAt_Update {
+type FormsFields_submitButtonLabel_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_createdAt_Delete {
+type FormsFields_submitButtonLabel_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_url {
-  create: MediaWithPrefixFields_url_Create
-  read: MediaWithPrefixFields_url_Read
-  update: MediaWithPrefixFields_url_Update
-  delete: MediaWithPrefixFields_url_Delete
+type FormsFields_confirmationType {
+  create: FormsFields_confirmationType_Create
+  read: FormsFields_confirmationType_Read
+  update: FormsFields_confirmationType_Update
+  delete: FormsFields_confirmationType_Delete
 }
 
-type MediaWithPrefixFields_url_Create {
+type FormsFields_confirmationType_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_url_Read {
+type FormsFields_confirmationType_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_url_Update {
+type FormsFields_confirmationType_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_url_Delete {
+type FormsFields_confirmationType_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_thumbnailURL {
-  create: MediaWithPrefixFields_thumbnailURL_Create
-  read: MediaWithPrefixFields_thumbnailURL_Read
-  update: MediaWithPrefixFields_thumbnailURL_Update
-  delete: MediaWithPrefixFields_thumbnailURL_Delete
+type FormsFields_confirmationMessage {
+  create: FormsFields_confirmationMessage_Create
+  read: FormsFields_confirmationMessage_Read
+  update: FormsFields_confirmationMessage_Update
+  delete: FormsFields_confirmationMessage_Delete
 }
 
-type MediaWithPrefixFields_thumbnailURL_Create {
+type FormsFields_confirmationMessage_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_thumbnailURL_Read {
+type FormsFields_confirmationMessage_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_thumbnailURL_Update {
+type FormsFields_confirmationMessage_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_thumbnailURL_Delete {
+type FormsFields_confirmationMessage_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_filename {
-  create: MediaWithPrefixFields_filename_Create
-  read: MediaWithPrefixFields_filename_Read
-  update: MediaWithPrefixFields_filename_Update
-  delete: MediaWithPrefixFields_filename_Delete
+type FormsFields_redirect {
+  create: FormsFields_redirect_Create
+  read: FormsFields_redirect_Read
+  update: FormsFields_redirect_Update
+  delete: FormsFields_redirect_Delete
+  fields: FormsFields_redirect_Fields
 }
 
-type MediaWithPrefixFields_filename_Create {
+type FormsFields_redirect_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_filename_Read {
+type FormsFields_redirect_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_filename_Update {
+type FormsFields_redirect_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_filename_Delete {
+type FormsFields_redirect_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_mimeType {
-  create: MediaWithPrefixFields_mimeType_Create
-  read: MediaWithPrefixFields_mimeType_Read
-  update: MediaWithPrefixFields_mimeType_Update
-  delete: MediaWithPrefixFields_mimeType_Delete
+type FormsFields_redirect_Fields {
+  url: FormsFields_redirect_url
 }
 
-type MediaWithPrefixFields_mimeType_Create {
+type FormsFields_redirect_url {
+  create: FormsFields_redirect_url_Create
+  read: FormsFields_redirect_url_Read
+  update: FormsFields_redirect_url_Update
+  delete: FormsFields_redirect_url_Delete
+}
+
+type FormsFields_redirect_url_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_mimeType_Read {
+type FormsFields_redirect_url_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_mimeType_Update {
+type FormsFields_redirect_url_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_mimeType_Delete {
+type FormsFields_redirect_url_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_filesize {
-  create: MediaWithPrefixFields_filesize_Create
-  read: MediaWithPrefixFields_filesize_Read
-  update: MediaWithPrefixFields_filesize_Update
-  delete: MediaWithPrefixFields_filesize_Delete
+type FormsFields_emails {
+  create: FormsFields_emails_Create
+  read: FormsFields_emails_Read
+  update: FormsFields_emails_Update
+  delete: FormsFields_emails_Delete
+  fields: FormsFields_emails_Fields
 }
 
-type MediaWithPrefixFields_filesize_Create {
+type FormsFields_emails_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_filesize_Read {
+type FormsFields_emails_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_filesize_Update {
+type FormsFields_emails_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_filesize_Delete {
+type FormsFields_emails_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_width {
-  create: MediaWithPrefixFields_width_Create
-  read: MediaWithPrefixFields_width_Read
-  update: MediaWithPrefixFields_width_Update
-  delete: MediaWithPrefixFields_width_Delete
+type FormsFields_emails_Fields {
+  emailTo: FormsFields_emails_emailTo
+  cc: FormsFields_emails_cc
+  bcc: FormsFields_emails_bcc
+  replyTo: FormsFields_emails_replyTo
+  emailFrom: FormsFields_emails_emailFrom
+  subject: FormsFields_emails_subject
+  message: FormsFields_emails_message
+  id: FormsFields_emails_id
 }
 
-type MediaWithPrefixFields_width_Create {
+type FormsFields_emails_emailTo {
+  create: FormsFields_emails_emailTo_Create
+  read: FormsFields_emails_emailTo_Read
+  update: FormsFields_emails_emailTo_Update
+  delete: FormsFields_emails_emailTo_Delete
+}
+
+type FormsFields_emails_emailTo_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_width_Read {
+type FormsFields_emails_emailTo_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_width_Update {
+type FormsFields_emails_emailTo_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_width_Delete {
+type FormsFields_emails_emailTo_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_height {
-  create: MediaWithPrefixFields_height_Create
-  read: MediaWithPrefixFields_height_Read
-  update: MediaWithPrefixFields_height_Update
-  delete: MediaWithPrefixFields_height_Delete
+type FormsFields_emails_cc {
+  create: FormsFields_emails_cc_Create
+  read: FormsFields_emails_cc_Read
+  update: FormsFields_emails_cc_Update
+  delete: FormsFields_emails_cc_Delete
 }
 
-type MediaWithPrefixFields_height_Create {
+type FormsFields_emails_cc_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_height_Read {
+type FormsFields_emails_cc_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_height_Update {
+type FormsFields_emails_cc_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_height_Delete {
+type FormsFields_emails_cc_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_focalX {
-  create: MediaWithPrefixFields_focalX_Create
-  read: MediaWithPrefixFields_focalX_Read
-  update: MediaWithPrefixFields_focalX_Update
-  delete: MediaWithPrefixFields_focalX_Delete
+type FormsFields_emails_bcc {
+  create: FormsFields_emails_bcc_Create
+  read: FormsFields_emails_bcc_Read
+  update: FormsFields_emails_bcc_Update
+  delete: FormsFields_emails_bcc_Delete
 }
 
-type MediaWithPrefixFields_focalX_Create {
+type FormsFields_emails_bcc_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_focalX_Read {
+type FormsFields_emails_bcc_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_focalX_Update {
+type FormsFields_emails_bcc_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_focalX_Delete {
+type FormsFields_emails_bcc_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_focalY {
-  create: MediaWithPrefixFields_focalY_Create
-  read: MediaWithPrefixFields_focalY_Read
-  update: MediaWithPrefixFields_focalY_Update
-  delete: MediaWithPrefixFields_focalY_Delete
+type FormsFields_emails_replyTo {
+  create: FormsFields_emails_replyTo_Create
+  read: FormsFields_emails_replyTo_Read
+  update: FormsFields_emails_replyTo_Update
+  delete: FormsFields_emails_replyTo_Delete
 }
 
-type MediaWithPrefixFields_focalY_Create {
+type FormsFields_emails_replyTo_Create {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_focalY_Read {
+type FormsFields_emails_replyTo_Read {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_focalY_Update {
+type FormsFields_emails_replyTo_Update {
   permission: Boolean!
 }
 
-type MediaWithPrefixFields_focalY_Delete {
+type FormsFields_emails_replyTo_Delete {
   permission: Boolean!
 }
 
-type MediaWithPrefixCreateAccess {
+type FormsFields_emails_emailFrom {
+  create: FormsFields_emails_emailFrom_Create
+  read: FormsFields_emails_emailFrom_Read
+  update: FormsFields_emails_emailFrom_Update
+  delete: FormsFields_emails_emailFrom_Delete
+}
+
+type FormsFields_emails_emailFrom_Create {
+  permission: Boolean!
+}
+
+type FormsFields_emails_emailFrom_Read {
+  permission: Boolean!
+}
+
+type FormsFields_emails_emailFrom_Update {
+  permission: Boolean!
+}
+
+type FormsFields_emails_emailFrom_Delete {
+  permission: Boolean!
+}
+
+type FormsFields_emails_subject {
+  create: FormsFields_emails_subject_Create
+  read: FormsFields_emails_subject_Read
+  update: FormsFields_emails_subject_Update
+  delete: FormsFields_emails_subject_Delete
+}
+
+type FormsFields_emails_subject_Create {
+  permission: Boolean!
+}
+
+type FormsFields_emails_subject_Read {
+  permission: Boolean!
+}
+
+type FormsFields_emails_subject_Update {
+  permission: Boolean!
+}
+
+type FormsFields_emails_subject_Delete {
+  permission: Boolean!
+}
+
+type FormsFields_emails_message {
+  create: FormsFields_emails_message_Create
+  read: FormsFields_emails_message_Read
+  update: FormsFields_emails_message_Update
+  delete: FormsFields_emails_message_Delete
+}
+
+type FormsFields_emails_message_Create {
+  permission: Boolean!
+}
+
+type FormsFields_emails_message_Read {
+  permission: Boolean!
+}
+
+type FormsFields_emails_message_Update {
+  permission: Boolean!
+}
+
+type FormsFields_emails_message_Delete {
+  permission: Boolean!
+}
+
+type FormsFields_emails_id {
+  create: FormsFields_emails_id_Create
+  read: FormsFields_emails_id_Read
+  update: FormsFields_emails_id_Update
+  delete: FormsFields_emails_id_Delete
+}
+
+type FormsFields_emails_id_Create {
+  permission: Boolean!
+}
+
+type FormsFields_emails_id_Read {
+  permission: Boolean!
+}
+
+type FormsFields_emails_id_Update {
+  permission: Boolean!
+}
+
+type FormsFields_emails_id_Delete {
+  permission: Boolean!
+}
+
+type FormsFields_updatedAt {
+  create: FormsFields_updatedAt_Create
+  read: FormsFields_updatedAt_Read
+  update: FormsFields_updatedAt_Update
+  delete: FormsFields_updatedAt_Delete
+}
+
+type FormsFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type FormsFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type FormsFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type FormsFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type FormsFields_createdAt {
+  create: FormsFields_createdAt_Create
+  read: FormsFields_createdAt_Read
+  update: FormsFields_createdAt_Update
+  delete: FormsFields_createdAt_Delete
+}
+
+type FormsFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type FormsFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type FormsFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type FormsFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type FormsCreateAccess {
   permission: Boolean!
   where: JSONObject
 }
 
-type MediaWithPrefixReadAccess {
+type FormsReadAccess {
   permission: Boolean!
   where: JSONObject
 }
 
-type MediaWithPrefixUpdateAccess {
+type FormsUpdateAccess {
   permission: Boolean!
   where: JSONObject
 }
 
-type MediaWithPrefixDeleteAccess {
+type FormsDeleteAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type form_submissionsAccess {
+  fields: FormSubmissionsFields
+  create: FormSubmissionsCreateAccess
+  read: FormSubmissionsReadAccess
+  update: FormSubmissionsUpdateAccess
+  delete: FormSubmissionsDeleteAccess
+}
+
+type FormSubmissionsFields {
+  form: FormSubmissionsFields_form
+  submissionData: FormSubmissionsFields_submissionData
+  updatedAt: FormSubmissionsFields_updatedAt
+  createdAt: FormSubmissionsFields_createdAt
+}
+
+type FormSubmissionsFields_form {
+  create: FormSubmissionsFields_form_Create
+  read: FormSubmissionsFields_form_Read
+  update: FormSubmissionsFields_form_Update
+  delete: FormSubmissionsFields_form_Delete
+}
+
+type FormSubmissionsFields_form_Create {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_form_Read {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_form_Update {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_form_Delete {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_submissionData {
+  create: FormSubmissionsFields_submissionData_Create
+  read: FormSubmissionsFields_submissionData_Read
+  update: FormSubmissionsFields_submissionData_Update
+  delete: FormSubmissionsFields_submissionData_Delete
+  fields: FormSubmissionsFields_submissionData_Fields
+}
+
+type FormSubmissionsFields_submissionData_Create {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_submissionData_Read {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_submissionData_Update {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_submissionData_Delete {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_submissionData_Fields {
+  field: FormSubmissionsFields_submissionData_field
+  value: FormSubmissionsFields_submissionData_value
+  id: FormSubmissionsFields_submissionData_id
+}
+
+type FormSubmissionsFields_submissionData_field {
+  create: FormSubmissionsFields_submissionData_field_Create
+  read: FormSubmissionsFields_submissionData_field_Read
+  update: FormSubmissionsFields_submissionData_field_Update
+  delete: FormSubmissionsFields_submissionData_field_Delete
+}
+
+type FormSubmissionsFields_submissionData_field_Create {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_submissionData_field_Read {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_submissionData_field_Update {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_submissionData_field_Delete {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_submissionData_value {
+  create: FormSubmissionsFields_submissionData_value_Create
+  read: FormSubmissionsFields_submissionData_value_Read
+  update: FormSubmissionsFields_submissionData_value_Update
+  delete: FormSubmissionsFields_submissionData_value_Delete
+}
+
+type FormSubmissionsFields_submissionData_value_Create {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_submissionData_value_Read {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_submissionData_value_Update {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_submissionData_value_Delete {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_submissionData_id {
+  create: FormSubmissionsFields_submissionData_id_Create
+  read: FormSubmissionsFields_submissionData_id_Read
+  update: FormSubmissionsFields_submissionData_id_Update
+  delete: FormSubmissionsFields_submissionData_id_Delete
+}
+
+type FormSubmissionsFields_submissionData_id_Create {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_submissionData_id_Read {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_submissionData_id_Update {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_submissionData_id_Delete {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_updatedAt {
+  create: FormSubmissionsFields_updatedAt_Create
+  read: FormSubmissionsFields_updatedAt_Read
+  update: FormSubmissionsFields_updatedAt_Update
+  delete: FormSubmissionsFields_updatedAt_Delete
+}
+
+type FormSubmissionsFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_createdAt {
+  create: FormSubmissionsFields_createdAt_Create
+  read: FormSubmissionsFields_createdAt_Read
+  update: FormSubmissionsFields_createdAt_Update
+  delete: FormSubmissionsFields_createdAt_Delete
+}
+
+type FormSubmissionsFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type FormSubmissionsFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type FormSubmissionsCreateAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type FormSubmissionsReadAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type FormSubmissionsUpdateAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type FormSubmissionsDeleteAccess {
   permission: Boolean!
   where: JSONObject
 }
@@ -5410,6 +9034,181 @@ type PayloadKvUpdateAccess {
 }
 
 type PayloadKvDeleteAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type payload_foldersAccess {
+  fields: PayloadFoldersFields
+  create: PayloadFoldersCreateAccess
+  read: PayloadFoldersReadAccess
+  update: PayloadFoldersUpdateAccess
+  delete: PayloadFoldersDeleteAccess
+}
+
+type PayloadFoldersFields {
+  name: PayloadFoldersFields_name
+  folder: PayloadFoldersFields_folder
+  documentsAndFolders: PayloadFoldersFields_documentsAndFolders
+  folderType: PayloadFoldersFields_folderType
+  updatedAt: PayloadFoldersFields_updatedAt
+  createdAt: PayloadFoldersFields_createdAt
+}
+
+type PayloadFoldersFields_name {
+  create: PayloadFoldersFields_name_Create
+  read: PayloadFoldersFields_name_Read
+  update: PayloadFoldersFields_name_Update
+  delete: PayloadFoldersFields_name_Delete
+}
+
+type PayloadFoldersFields_name_Create {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_name_Read {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_name_Update {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_name_Delete {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_folder {
+  create: PayloadFoldersFields_folder_Create
+  read: PayloadFoldersFields_folder_Read
+  update: PayloadFoldersFields_folder_Update
+  delete: PayloadFoldersFields_folder_Delete
+}
+
+type PayloadFoldersFields_folder_Create {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_folder_Read {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_folder_Update {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_folder_Delete {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_documentsAndFolders {
+  create: PayloadFoldersFields_documentsAndFolders_Create
+  read: PayloadFoldersFields_documentsAndFolders_Read
+  update: PayloadFoldersFields_documentsAndFolders_Update
+  delete: PayloadFoldersFields_documentsAndFolders_Delete
+}
+
+type PayloadFoldersFields_documentsAndFolders_Create {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_documentsAndFolders_Read {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_documentsAndFolders_Update {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_documentsAndFolders_Delete {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_folderType {
+  create: PayloadFoldersFields_folderType_Create
+  read: PayloadFoldersFields_folderType_Read
+  update: PayloadFoldersFields_folderType_Update
+  delete: PayloadFoldersFields_folderType_Delete
+}
+
+type PayloadFoldersFields_folderType_Create {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_folderType_Read {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_folderType_Update {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_folderType_Delete {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_updatedAt {
+  create: PayloadFoldersFields_updatedAt_Create
+  read: PayloadFoldersFields_updatedAt_Read
+  update: PayloadFoldersFields_updatedAt_Update
+  delete: PayloadFoldersFields_updatedAt_Delete
+}
+
+type PayloadFoldersFields_updatedAt_Create {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_updatedAt_Read {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_updatedAt_Update {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_updatedAt_Delete {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_createdAt {
+  create: PayloadFoldersFields_createdAt_Create
+  read: PayloadFoldersFields_createdAt_Read
+  update: PayloadFoldersFields_createdAt_Update
+  delete: PayloadFoldersFields_createdAt_Delete
+}
+
+type PayloadFoldersFields_createdAt_Create {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_createdAt_Read {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_createdAt_Update {
+  permission: Boolean!
+}
+
+type PayloadFoldersFields_createdAt_Delete {
+  permission: Boolean!
+}
+
+type PayloadFoldersCreateAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type PayloadFoldersReadAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type PayloadFoldersUpdateAccess {
+  permission: Boolean!
+  where: JSONObject
+}
+
+type PayloadFoldersDeleteAccess {
   permission: Boolean!
   where: JSONObject
 }
@@ -5739,14 +9538,22 @@ type Mutation {
   updateMedia(id: Int!, autosave: Boolean, data: mutationMediaUpdateInput!, draft: Boolean, trash: Boolean): Media
   deleteMedia(id: Int!, trash: Boolean): Media
   duplicateMedia(id: Int!, data: mutationMediaInput!): Media
-  createMediaWithPrefix(data: mutationMediaWithPrefixInput!, draft: Boolean): MediaWithPrefix
-  updateMediaWithPrefix(id: Int!, autosave: Boolean, data: mutationMediaWithPrefixUpdateInput!, draft: Boolean, trash: Boolean): MediaWithPrefix
-  deleteMediaWithPrefix(id: Int!, trash: Boolean): MediaWithPrefix
-  duplicateMediaWithPrefix(id: Int!, data: mutationMediaWithPrefixInput!): MediaWithPrefix
+  createForm(data: mutationFormInput!, draft: Boolean): Form
+  updateForm(id: Int!, autosave: Boolean, data: mutationFormUpdateInput!, draft: Boolean, trash: Boolean): Form
+  deleteForm(id: Int!, trash: Boolean): Form
+  duplicateForm(id: Int!, data: mutationFormInput!): Form
+  createFormSubmission(data: mutationFormSubmissionInput!, draft: Boolean): FormSubmission
+  updateFormSubmission(id: Int!, autosave: Boolean, data: mutationFormSubmissionUpdateInput!, draft: Boolean, trash: Boolean): FormSubmission
+  deleteFormSubmission(id: Int!, trash: Boolean): FormSubmission
+  duplicateFormSubmission(id: Int!, data: mutationFormSubmissionInput!): FormSubmission
   createPayloadKv(data: mutationPayloadKvInput!, draft: Boolean): PayloadKv
   updatePayloadKv(id: Int!, autosave: Boolean, data: mutationPayloadKvUpdateInput!, draft: Boolean, trash: Boolean): PayloadKv
   deletePayloadKv(id: Int!, trash: Boolean): PayloadKv
   duplicatePayloadKv(id: Int!, data: mutationPayloadKvInput!): PayloadKv
+  createPayloadFolder(data: mutationPayloadFolderInput!, draft: Boolean): PayloadFolder
+  updatePayloadFolder(id: Int!, autosave: Boolean, data: mutationPayloadFolderUpdateInput!, draft: Boolean, trash: Boolean): PayloadFolder
+  deletePayloadFolder(id: Int!, trash: Boolean): PayloadFolder
+  duplicatePayloadFolder(id: Int!, data: mutationPayloadFolderInput!): PayloadFolder
   createPayloadLockedDocument(data: mutationPayloadLockedDocumentInput!, draft: Boolean): PayloadLockedDocument
   updatePayloadLockedDocument(id: Int!, autosave: Boolean, data: mutationPayloadLockedDocumentUpdateInput!, draft: Boolean, trash: Boolean): PayloadLockedDocument
   deletePayloadLockedDocument(id: Int!, trash: Boolean): PayloadLockedDocument
@@ -5906,6 +9713,8 @@ input mutationTenantUpdateInput {
 
 input mutationMediaInput {
   alt: String
+  caption: JSON
+  folder: Int
   updatedAt: String
   createdAt: String
   url: String
@@ -5921,8 +9730,22 @@ input mutationMediaInput {
 }
 
 input mutationMedia_SizesInput {
+  thumbnail: mutationMedia_Sizes_ThumbnailInput
   square: mutationMedia_Sizes_SquareInput
-  sixteenByNineMedium: mutationMedia_Sizes_SixteenByNineMediumInput
+  small: mutationMedia_Sizes_SmallInput
+  medium: mutationMedia_Sizes_MediumInput
+  large: mutationMedia_Sizes_LargeInput
+  xlarge: mutationMedia_Sizes_XlargeInput
+  og: mutationMedia_Sizes_OgInput
+}
+
+input mutationMedia_Sizes_ThumbnailInput {
+  url: String
+  width: Float
+  height: Float
+  mimeType: String
+  filesize: Float
+  filename: String
 }
 
 input mutationMedia_Sizes_SquareInput {
@@ -5934,7 +9757,43 @@ input mutationMedia_Sizes_SquareInput {
   filename: String
 }
 
-input mutationMedia_Sizes_SixteenByNineMediumInput {
+input mutationMedia_Sizes_SmallInput {
+  url: String
+  width: Float
+  height: Float
+  mimeType: String
+  filesize: Float
+  filename: String
+}
+
+input mutationMedia_Sizes_MediumInput {
+  url: String
+  width: Float
+  height: Float
+  mimeType: String
+  filesize: Float
+  filename: String
+}
+
+input mutationMedia_Sizes_LargeInput {
+  url: String
+  width: Float
+  height: Float
+  mimeType: String
+  filesize: Float
+  filename: String
+}
+
+input mutationMedia_Sizes_XlargeInput {
+  url: String
+  width: Float
+  height: Float
+  mimeType: String
+  filesize: Float
+  filename: String
+}
+
+input mutationMedia_Sizes_OgInput {
   url: String
   width: Float
   height: Float
@@ -5945,6 +9804,8 @@ input mutationMedia_Sizes_SixteenByNineMediumInput {
 
 input mutationMediaUpdateInput {
   alt: String
+  caption: JSON
+  folder: Int
   updatedAt: String
   createdAt: String
   url: String
@@ -5960,8 +9821,22 @@ input mutationMediaUpdateInput {
 }
 
 input mutationMediaUpdate_SizesInput {
+  thumbnail: mutationMediaUpdate_Sizes_ThumbnailInput
   square: mutationMediaUpdate_Sizes_SquareInput
-  sixteenByNineMedium: mutationMediaUpdate_Sizes_SixteenByNineMediumInput
+  small: mutationMediaUpdate_Sizes_SmallInput
+  medium: mutationMediaUpdate_Sizes_MediumInput
+  large: mutationMediaUpdate_Sizes_LargeInput
+  xlarge: mutationMediaUpdate_Sizes_XlargeInput
+  og: mutationMediaUpdate_Sizes_OgInput
+}
+
+input mutationMediaUpdate_Sizes_ThumbnailInput {
+  url: String
+  width: Float
+  height: Float
+  mimeType: String
+  filesize: Float
+  filename: String
 }
 
 input mutationMediaUpdate_Sizes_SquareInput {
@@ -5973,7 +9848,7 @@ input mutationMediaUpdate_Sizes_SquareInput {
   filename: String
 }
 
-input mutationMediaUpdate_Sizes_SixteenByNineMediumInput {
+input mutationMediaUpdate_Sizes_SmallInput {
   url: String
   width: Float
   height: Float
@@ -5982,34 +9857,120 @@ input mutationMediaUpdate_Sizes_SixteenByNineMediumInput {
   filename: String
 }
 
-input mutationMediaWithPrefixInput {
-  prefix: String
-  updatedAt: String
-  createdAt: String
+input mutationMediaUpdate_Sizes_MediumInput {
   url: String
-  thumbnailURL: String
-  filename: String
-  mimeType: String
-  filesize: Float
   width: Float
   height: Float
-  focalX: Float
-  focalY: Float
+  mimeType: String
+  filesize: Float
+  filename: String
 }
 
-input mutationMediaWithPrefixUpdateInput {
-  prefix: String
-  updatedAt: String
-  createdAt: String
+input mutationMediaUpdate_Sizes_LargeInput {
   url: String
-  thumbnailURL: String
-  filename: String
-  mimeType: String
-  filesize: Float
   width: Float
   height: Float
-  focalX: Float
-  focalY: Float
+  mimeType: String
+  filesize: Float
+  filename: String
+}
+
+input mutationMediaUpdate_Sizes_XlargeInput {
+  url: String
+  width: Float
+  height: Float
+  mimeType: String
+  filesize: Float
+  filename: String
+}
+
+input mutationMediaUpdate_Sizes_OgInput {
+  url: String
+  width: Float
+  height: Float
+  mimeType: String
+  filesize: Float
+  filename: String
+}
+
+input mutationFormInput {
+  title: String!
+  fields: JSON
+  submitButtonLabel: String
+  confirmationType: String
+  confirmationMessage: JSON
+  redirect: mutationForm_RedirectInput!
+  emails: [mutationForm_EmailsInput]
+  updatedAt: String
+  createdAt: String
+}
+
+input mutationForm_RedirectInput {
+  url: String!
+}
+
+input mutationForm_EmailsInput {
+  emailTo: String
+  cc: String
+  bcc: String
+  replyTo: String
+  emailFrom: String
+  subject: String!
+  message: JSON
+  id: String
+}
+
+input mutationFormUpdateInput {
+  title: String
+  fields: JSON
+  submitButtonLabel: String
+  confirmationType: String
+  confirmationMessage: JSON
+  redirect: mutationFormUpdate_RedirectInput!
+  emails: [mutationFormUpdate_EmailsInput]
+  updatedAt: String
+  createdAt: String
+}
+
+input mutationFormUpdate_RedirectInput {
+  url: String!
+}
+
+input mutationFormUpdate_EmailsInput {
+  emailTo: String
+  cc: String
+  bcc: String
+  replyTo: String
+  emailFrom: String
+  subject: String!
+  message: JSON
+  id: String
+}
+
+input mutationFormSubmissionInput {
+  form: Int
+  submissionData: [mutationFormSubmission_SubmissionDataInput]
+  updatedAt: String
+  createdAt: String
+}
+
+input mutationFormSubmission_SubmissionDataInput {
+  field: String!
+  value: String!
+  id: String
+}
+
+input mutationFormSubmissionUpdateInput {
+  form: Int
+  submissionData: [mutationFormSubmissionUpdate_SubmissionDataInput]
+  updatedAt: String
+  createdAt: String
+}
+
+input mutationFormSubmissionUpdate_SubmissionDataInput {
+  field: String!
+  value: String!
+  id: String
 }
 
 input mutationPayloadKvInput {
@@ -6020,6 +9981,30 @@ input mutationPayloadKvInput {
 input mutationPayloadKvUpdateInput {
   key: String
   data: JSON
+}
+
+input mutationPayloadFolderInput {
+  name: String!
+  folder: Int
+  folderType: [PayloadFolder_folderType_MutationInput]
+  updatedAt: String
+  createdAt: String
+}
+
+enum PayloadFolder_folderType_MutationInput {
+  media
+}
+
+input mutationPayloadFolderUpdateInput {
+  name: String
+  folder: Int
+  folderType: [PayloadFolderUpdate_folderType_MutationInput]
+  updatedAt: String
+  createdAt: String
+}
+
+enum PayloadFolderUpdate_folderType_MutationInput {
+  media
 }
 
 input mutationPayloadLockedDocumentInput {
@@ -6040,7 +10025,9 @@ enum PayloadLockedDocument_DocumentRelationshipInputRelationTo {
   users
   tenants
   media
-  media_with_prefix
+  forms
+  form_submissions
+  payload_folders
 }
 
 input PayloadLockedDocument_UserRelationshipInput {
@@ -6070,7 +10057,9 @@ enum PayloadLockedDocumentUpdate_DocumentRelationshipInputRelationTo {
   users
   tenants
   media
-  media_with_prefix
+  forms
+  form_submissions
+  payload_folders
 }
 
 input PayloadLockedDocumentUpdate_UserRelationshipInput {

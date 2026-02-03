@@ -5,6 +5,7 @@ import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { Media } from "./collections/Media";
+import { formBuilderPlugin } from "@payloadcms/plugin-form-builder";
 
 import { Pages } from "./collections/Pages";
 import { Tenants } from "./collections/Tenants";
@@ -80,5 +81,6 @@ export default buildConfig({
       },
       userHasAccessToAllTenants: (user) => isSuperAdmin(user),
     }),
+    formBuilderPlugin({}),
   ],
 });
