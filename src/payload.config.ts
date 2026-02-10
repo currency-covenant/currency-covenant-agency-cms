@@ -4,7 +4,7 @@ import path from "path";
 import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
 import { s3Storage } from "@payloadcms/storage-s3";
-import { Media } from "./collections/Media";
+import { ContactSubmissions } from "./collections/ContactSubmissions";
 import { formBuilderPlugin } from "@payloadcms/plugin-form-builder";
 
 import { Pages } from "./collections/Pages";
@@ -24,7 +24,7 @@ export default buildConfig({
   admin: {
     user: "users",
   },
-  collections: [Pages, Users, Tenants, Media],
+  collections: [Pages, Users, Tenants, Media, ContactSubmissions],
   // db: mongooseAdapter({
   //   url: process.env.DATABASE_URL as string,
   // }),
