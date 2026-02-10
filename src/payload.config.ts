@@ -81,6 +81,12 @@ export default buildConfig({
       },
       userHasAccessToAllTenants: (user) => isSuperAdmin(user),
     }),
-    formBuilderPlugin({}),
+    formBuilderPlugin({
+        formSubmissionOverrides: {
+          access: {
+            create: () => true,
+          },
+        },
+      }),
   ],
 });
