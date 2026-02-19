@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { ContactSubmissions } from "./collections/ContactSubmissions";
 import { formBuilderPlugin } from "@payloadcms/plugin-form-builder";
-
+import { Media } from "./collections/Media";
 import { Pages } from "./collections/Pages";
 import { Tenants } from "./collections/Tenants";
 import Users from "./collections/Users";
@@ -82,11 +82,11 @@ export default buildConfig({
       userHasAccessToAllTenants: (user) => isSuperAdmin(user),
     }),
     formBuilderPlugin({
-        formSubmissionOverrides: {
-          access: {
-            create: () => true,
-          },
+      formSubmissionOverrides: {
+        access: {
+          create: () => true,
         },
-      }),
+      },
+    }),
   ],
 });
